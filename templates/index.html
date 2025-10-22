@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Nabídka dresů</h1>
+<ul>
+    {% for product in products %}
+    <li>
+        <strong>{{ product.name }}</strong> - {{ product.team }}
+        ({{ product.size }}) - {{ product.price }} Kč
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

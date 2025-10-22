@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>E-shop Dresy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<nav>
+    <a href="{{ url_for('index') }}">Domů</a>
+    {% if session.get("user_id") %}
+        <span>Vítej, {{ session["username"] }}</span>
+        <a href="{{ url_for('logout') }}">Odhlásit se</a>
+    {% else %}
+        <a href="{{ url_for('login') }}">Přihlášení</a>
+        <a href="{{ url_for('register') }}">Registrace</a>
+    {% endif %}
+</nav>
+<hr>
+{% block content %}{% endblock %}
+</body>
+</html>
