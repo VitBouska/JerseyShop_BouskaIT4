@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Přihlášení</h2>
-<form method="POST">
-    <input type="email" name="email" placeholder="Email" required><br>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+<form method="POST" action="{{ url_for('login') }}">
+    <input type="text" name="username" placeholder="Uživatelské jméno" required><br>
     <input type="password" name="password" placeholder="Heslo" required><br>
     <button type="submit">Přihlásit</button>
 </form>

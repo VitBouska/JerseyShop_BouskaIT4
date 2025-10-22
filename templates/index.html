@@ -1,12 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Nabídka dresů</h1>
-<ul>
-    {% for product in products %}
-    <li>
-        <strong>{{ product.name }}</strong> - {{ product.team }}
-        ({{ product.size }}) - {{ product.price }} Kč
-    </li>
-    {% endfor %}
-</ul>
+<h2>Domů</h2>
+{% if session.get("user_id") %}
+  <p>Jste přihlášen jako {{ session["username"] }}.</p>
+{% else %}
+  <p>Nejste přihlášen.</p>
+{% endif %}
 {% endblock %}
