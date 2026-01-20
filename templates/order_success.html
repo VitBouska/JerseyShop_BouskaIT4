@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Objednávka odeslána • E-shop dresy{% endblock %}
+
+{% block content %}
+
+<div class="card">
+  <h2>Objednávka odeslána ✅</h2>
+  <p class="muted">Děkujeme! Níže je souhrn.</p>
+
+  <div class="order-meta">
+    <div><span class="muted">Číslo objednávky:</span> <strong>{{ order.order_id }}</strong></div>
+    <div><span class="muted">Vytvořeno:</span> <strong>{{ order.created_at }}</strong></div>
+  </div>
+
+  <hr>
+
+  <h3 class="section-title">Doručení</h3>
+  <p><strong>{{ order.full_name }}</strong><br>{{ order.address }}<br><span class="muted">{{ order.email }}</span></p>
+
+  <hr>
+
+  <h3 class="section-title">Položky</h3>
+  <div class="summary-list">
+    {% for it in order.items %}
+      <div class="summary-item">
+        <div>
+          <strong>{{ it.name }}</strong>
+          <div class="muted">{{ it.qty }}× {{ it.price }} Kč</div>
+        </div>
+        <div><strong>{{ it.qty * it.price }} Kč</strong></div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <hr>
+
+  <div class="summary-total">
+    <div class="muted">Celkem</div>
+    <div class="total">{{ order.total }} Kč</div>
+  </div>
+
+  <div class="cart-actions" style="margin-top:14px;">
+    <a class="btn" href="{{ url_for('index') }}">Zpět do obchodu</a>
+    <a class="btn ghost" href="{{ url_for('cart') }}">Košík</a>
+  </div>
+</div>
+
+{% endblock %}
