@@ -8,6 +8,16 @@
 </head>
 
 <body>
+    <header class="site-header">
+    <div class="header-inner">
+        <div class="logo">
+            <span>E-shop Dresy</span>
+        </div>
+        <div class="tagline">
+        Fotbalové dresy evropských klubů
+        </div>
+    </div>
+    </header>
   <!-- Navigace -->
   <nav>
   <a href="{{ url_for('index') }}">Domů</a>
@@ -41,12 +51,35 @@
 
 <footer class="footer">
   <div class="footer-inner">
-    <p>© 2026 <strong>E-shop Dresy</strong></p>
-    <p class="footer-links">
-      <span>Školní projekt</span> ·
-      <a href="#">O nás</a> ·
-      <a href="#">Kontakt</a>
-    </p>
+
+    <div class="footer-col">
+      <h4>E-shop Dresy</h4>
+      <p>Školní projekt – ukázkový e-shop s fotbalovými dresy.</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>Informace</h4>
+      <ul>
+        <li><a href="#">O nás</a></li>
+        <li><a href="#">Kontakt</a></li>
+        <li><a href="#">Obchodní podmínky</a></li>
+        <li><a href="#">Reklamace</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Platby & doprava</h4>
+      <ul>
+        <li>💳 Karta online</li>
+        <li>🏦 Bankovní převod</li>
+        <li>📦 Kurýr / osobní odběr</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    © 2026 E-shop Dresy
   </div>
 </footer>
 

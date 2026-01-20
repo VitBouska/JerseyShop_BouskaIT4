@@ -477,33 +477,97 @@ input:focus, select:focus{
 }
 
 /* =========================
-   Footer
+   Footer (eshop)
 ========================= */
 .footer{
-  margin-top: 40px;
-  padding: 24px 18px;
+  margin-top: 50px;
+  background: #ffffff;
   border-top: 1px solid var(--border);
-  background: #fff;
 }
 
 .footer-inner{
   max-width: 1100px;
   margin: 0 auto;
-  text-align: center;
-  color: var(--muted);
-  font-size: 0.95rem;
+  padding: 30px 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 30px;
 }
 
-.footer-inner p{
-  margin: 6px 0;
-}
-
-.footer-links a{
+.footer-col h4{
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+  font-weight: 900;
   color: var(--text);
-  font-weight: 700;
-  text-decoration: none;
 }
 
-.footer-links a:hover{
+.footer-col p{
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.footer-col ul{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-col li{
+  margin: 6px 0;
+  color: var(--muted);
+}
+
+.footer-col a{
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.footer-col a:hover{
   text-decoration: underline;
+}
+
+.footer-bottom{
+  border-top: 1px solid var(--border);
+  text-align: center;
+  padding: 14px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* =========================
+   Header
+========================= */
+.site-header{
+  background: linear-gradient(90deg, var(--primary), var(--primary2));
+  color: #fff;
+}
+
+.header-inner{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 26px 18px 22px;
+  text-align: center;
+}
+
+.logo{
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.logo span{
+  margin-left: 6px;
+}
+
+.tagline{
+  margin-top: 6px;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+/* trochu oddělení headeru od navigace */
+nav{
+  margin-top: 12px;
 }
