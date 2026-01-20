@@ -1,9 +1,262 @@
 {% extends "base.html" %}
+{% block title %}Domů • E-shop Dresy{% endblock %}
 {% block content %}
-<h2>Domů</h2>
-{% if session.get("user_id") %}
-  <p>Jste přihlášen jako {{ session["username"] }}.</p>
-{% else %}
-  <p>Nejste přihlášen.</p>
-{% endif %}
+
+<!-- =========================
+     FILTRY + HLEDÁNÍ
+     ========================= -->
+<section class="toolbar">
+  <div class="toolbar-row">
+    <input id="searchInput" type="search" placeholder="Hledat dres (Real, Sevilla, Česko…)" />
+
+    <select id="categoryFilter">
+      <option value="all">Všechny kategorie</option>
+      <option value="modern">Moderní</option>
+      <option value="retro">Retro</option>
+    </select>
+
+    <select id="badgeFilter">
+      <option value="all">Všechny štítky</option>
+      <option value="sleva">Sleva</option>
+      <option value="novinka">Novinka</option>
+      <option value="top">Top</option>
+      <option value="retro">Retro</option>
+      <option value="limitka">Limitka</option>
+      <option value="ikona">Ikona</option>
+    </select>
+
+    <input id="minPrice" type="number" placeholder="Min Kč">
+    <input id="maxPrice" type="number" placeholder="Max Kč">
+
+    <button class="btn ghost" id="resetFilters" type="button">Reset</button>
+  </div>
+
+  <div class="toolbar-row meta">
+    <span id="resultsCount" class="muted"></span>
+    <div class="range-wrap">
+      <label class="muted">Max cena:</label>
+      <input id="maxPriceRange" type="range" min="0" step="50">
+      <span id="maxPriceRangeLabel" class="muted"></span>
+    </div>
+  </div>
+</section>
+
+<!-- =========================
+     MODERNÍ DRESY
+     ========================= -->
+<section class="products">
+  <h2>Moderní dresy</h2>
+
+  <div class="grid">
+
+    <article class="card product-card"
+      data-product="1" data-name="Manchester City domácí"
+      data-category="modern" data-badge="novinka" data-price="1799">
+      <div class="badge">Novinka</div>
+      <h3>Manchester City – domácí</h3>
+      <p class="muted">24/25 • Skladem</p>
+      <div class="price">1 799 Kč</div>
+      <a class="btn small" href="#">Detail</a>
+    </article>
+
+    <article class="card product-card"
+      data-product="1" data-name="Liverpool domácí"
+      data-category="modern" data-badge="top" data-price="1749">
+      <div class="badge">Top</div>
+      <h3>Liverpool – domácí</h3>
+      <p class="muted">24/25 • Skladem</p>
+      <div class="price">1 749 Kč</div>
+      <a class="btn small" href="#">Detail</a>
+    </article>
+
+    <article class="card product-card"
+      data-product="1" data-name="Arsenal venkovní"
+      data-category="modern" data-badge="sleva" data-price="1299">
+      <div class="badge sale-badge">Sleva</div>
+      <h3>Arsenal – venkovní</h3>
+      <p class="muted">23/24 • Skladem</p>
+      <div class="price sale">
+        <span class="strike">1 699 Kč</span>
+        <span class="sale-price">1 299 Kč</span>
+      </div>
+      <a class="btn small" href="#">Detail</a>
+    </article>
+
+    <article class="card product-card"
+      data-product="1" data-name="Sevilla venkovní"
+      data-category="modern" data-badge="sleva" data-price="1199">
+      <div class="badge sale-badge">Sleva</div>
+      <h3>Sevilla – venkovní</h3>
+      <p class="muted">23/24 • Poslední kusy</p>
+      <div class="price sale">
+        <span class="strike">1 499 Kč</span>
+        <span class="sale-price">1 199 Kč</span>
+      </div>
+      <a class="btn small" href="#">Detail</a>
+    </article>
+
+    <article class="card product-card"
+      data-product="1" data-name="Real Madrid venkovní"
+      data-category="modern" data-badge="top" data-price="1899">
+      <div class="badge">Top</div>
+      <h3>Real Madrid – venkovní</h3>
+      <p class="muted">24/25 • Skladem</p>
+      <div class="price">1 899 Kč</div>
+      <a class="btn small" href="#">Detail</a>
+    </article>
+
+    <article class="card product-card"
+      data-product="1" data-name="Česko reprezentační dres"
+      data-category="modern" data-badge="sleva" data-price="1299">
+      <div class="badge sale-badge">Sleva</div>
+      <h3>Česko – reprezentační dres</h3>
+      <p class="muted">Limitka • Poslední kusy</p>
+      <div class="price sale">
+        <span class="strike">1 699 Kč</span>
+        <span class="sale-price">1 299 Kč</span>
+      </div>
+      <a class="btn small" href="#">Detail</a>
+    </article>
+
+  </div>
+</section>
+
+<!-- =========================
+     RETRO DRESY
+     ========================= -->
+<section class="products">
+  <h2>Retro & legendární dresy</h2>
+
+  <div class="grid">
+
+    <article class="card product-card"
+      data-product="1" data-name="Manchester United 1999"
+      data-category="retro" data-badge="retro" data-price="1999">
+      <div class="badge">Retro</div>
+      <h3>Manchester United 1998/99</h3>
+      <p class="muted">Treble sezóna</p>
+      <div class="price">1 999 Kč</div>
+      <a class="btn small" href="#">Detail</a>
+    </article>
+
+    <article class="card product-card"
+      data-product="1" data-name="AC Milan 1989"
+      data-category="retro" data-badge="retro" data-price="1949">
+      <div class="badge">Retro</div>
+      <h3>AC Milán 1988/89</h3>
+      <p class="muted">Éra Sacchi</p>
+      <div class="price">1 949 Kč</div>
+      <a class="btn small" href="#">Detail</a>
+    </article>
+
+    <article class="card product-card"
+      data-product="1" data-name="Argentina 1986"
+      data-category="retro" data-badge="ikona" data-price="2199">
+      <div class="badge">Ikona</div>
+      <h3>Argentina 1986</h3>
+      <p class="muted">MS Mexiko • Maradona</p>
+      <div class="price">2 199 Kč</div>
+      <a class="btn small" href="#">Detail</a>
+    </article>
+
+    <article class="card product-card"
+      data-product="1" data-name="Barcelona 1992"
+      data-category="retro" data-badge="sleva" data-price="1699">
+      <div class="badge sale-badge">Sleva</div>
+      <h3>FC Barcelona 1992</h3>
+      <p class="muted">Dream Team</p>
+      <div class="price sale">
+        <span class="strike">2 099 Kč</span>
+        <span class="sale-price">1 699 Kč</span>
+      </div>
+      <a class="btn small" href="#">Detail</a>
+    </article>
+
+  </div>
+</section>
+
+<!-- =========================
+     JAVASCRIPT – FILTRY
+     ========================= -->
+<script>
+  const searchInput = document.getElementById('searchInput');
+  const categoryFilter = document.getElementById('categoryFilter');
+  const badgeFilter = document.getElementById('badgeFilter');
+  const minPriceInput = document.getElementById('minPrice');
+  const maxPriceInput = document.getElementById('maxPrice');
+  const maxPriceRange = document.getElementById('maxPriceRange');
+  const maxPriceRangeLabel = document.getElementById('maxPriceRangeLabel');
+  const resetBtn = document.getElementById('resetFilters');
+  const resultsCount = document.getElementById('resultsCount');
+
+  const cards = Array.from(document.querySelectorAll('.product-card'));
+
+  function normalize(t) {
+    return String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  function toNumber(v) {
+    const n = Number(String(v || '').replace(/[^\d]/g, ''));
+    return Number.isFinite(n) ? n : NaN;
+  }
+
+  const prices = cards.map(c => toNumber(c.dataset.price)).filter(n => !isNaN(n));
+  const max = Math.max(...prices, 2500);
+  maxPriceRange.max = max;
+  maxPriceRange.value = max;
+  maxPriceRangeLabel.textContent = `${max} Kč`;
+
+  function applyFilters() {
+    let visible = 0;
+    const q = normalize(searchInput.value);
+    const cat = categoryFilter.value;
+    const badge = badgeFilter.value;
+    const minP = toNumber(minPriceInput.value);
+    const maxP = toNumber(maxPriceInput.value || maxPriceRange.value);
+
+    cards.forEach(card => {
+      const name = normalize(card.dataset.name);
+      const c = card.dataset.category;
+      const b = card.dataset.badge;
+      const p = toNumber(card.dataset.price);
+
+      const show =
+        (!q || name.includes(q)) &&
+        (cat === 'all' || c === cat) &&
+        (badge === 'all' || b === badge) &&
+        (isNaN(minP) || p >= minP) &&
+        (isNaN(maxP) || p <= maxP);
+
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+
+    resultsCount.textContent = `Zobrazeno ${visible} z ${cards.length}`;
+  }
+
+  searchInput.addEventListener('input', applyFilters);
+  categoryFilter.addEventListener('change', applyFilters);
+  badgeFilter.addEventListener('change', applyFilters);
+  minPriceInput.addEventListener('input', applyFilters);
+  maxPriceInput.addEventListener('input', applyFilters);
+  maxPriceRange.addEventListener('input', () => {
+    maxPriceInput.value = maxPriceRange.value;
+    maxPriceRangeLabel.textContent = `${maxPriceRange.value} Kč`;
+    applyFilters();
+  });
+
+  resetBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    categoryFilter.value = 'all';
+    badgeFilter.value = 'all';
+    minPriceInput.value = '';
+    maxPriceInput.value = '';
+    maxPriceRange.value = max;
+    maxPriceRangeLabel.textContent = `${max} Kč`;
+    applyFilters();
+  });
+
+  applyFilters();
+</script>
+
 {% endblock %}

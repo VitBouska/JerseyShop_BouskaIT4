@@ -1,33 +1,42 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="cs">
 <head>
-    <meta charset="UTF-8">
-    <title>E-shop Dresy</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}E-shop Dresy{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
-<nav>
+  <!-- Navigace -->
+  <nav>
     <a href="{{ url_for('index') }}">Domů</a>
+
     {% if session.get("user_id") %}
-        <span>Vítej, {{ session["username"] }}</span>
-        <a href="{{ url_for('logout') }}">Odhlásit se</a>
+      <span>Vítej, {{ session["username"] }}</span>
+      <a href="{{ url_for('logout') }}">Odhlásit se</a>
     {% else %}
-        <a href="{{ url_for('login') }}">Přihlášení</a>
-        <a href="{{ url_for('register') }}">Registrace</a>
+      <a href="{{ url_for('login') }}">Přihlášení</a>
+      <a href="{{ url_for('register') }}">Registrace</a>
     {% endif %}
-</nav>
-<hr>
+  </nav>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <ul class="flashes">
-      {% for category, message in messages %}
-        <li class="flash {{ category }}">{{ message }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
+  <hr>
 
-{% block content %}{% endblock %}
+  <!-- Obsah stránky -->
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes" aria-live="polite">
+          {% for category, message in messages %}
+            <li class="flash {{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
 </body>
 </html>

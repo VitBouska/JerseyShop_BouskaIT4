@@ -1,10 +1,32 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Přihlášení</h2>
-{% if error %}<p class="error">{{ error }}</p>{% endif %}
-<form method="POST" action="{{ url_for('login') }}">
-    <input type="text" name="username" placeholder="Uživatelské jméno" required><br>
-    <input type="password" name="password" placeholder="Heslo" required><br>
-    <button type="submit">Přihlásit</button>
+
+{% if error %}
+  <p class="error" role="alert">{{ error }}</p>
+{% endif %}
+
+<form method="POST" action="{{ url_for('login') }}" autocomplete="on">
+  <div class="field">
+    <label for="username">Uživatelské jméno</label>
+    <input id="username" type="text" name="username" placeholder="Uživatelské jméno" required autocomplete="username">
+  </div>
+
+  <div class="field">
+    <label for="password">Heslo</label>
+    <input id="password" type="password" name="password" placeholder="Heslo" required autocomplete="current-password">
+    <label class="checkbox">
+      <input type="checkbox" id="togglePass">
+      Zobrazit heslo
+    </label>
+  </div>
+
+  <button type="submit">Přihlásit</button>
 </form>
+
+<script>
+  const t = document.getElementById('togglePass');
+  const p = document.getElementById('password');
+  if (t && p) t.addEventListener('change', () => p.type = t.checked ? 'text' : 'password');
+</script>
 {% endblock %}

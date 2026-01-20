@@ -1,11 +1,50 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Registrace</h2>
-{% if error %}<p class="error">{{ error }}</p>{% endif %}
-<form method="POST" action="{{ url_for('register') }}">
-    <input type="text" name="username" placeholder="Uživatelské jméno" required><br>
-    <input type="email" name="email" placeholder="Email" required><br>
-    <input type="password" name="password" placeholder="Heslo" required><br>
-    <button type="submit">Registrovat</button>
+
+{% if error %}
+  <p class="error" role="alert">{{ error }}</p>
+{% endif %}
+
+<form method="POST" action="{{ url_for('register') }}" autocomplete="on">
+  <div class="field">
+    <label for="username">Uživatelské jméno</label>
+    <input id="username" type="text" name="username" placeholder="Uživatelské jméno" required autocomplete="username">
+  </div>
+
+  <div class="field">
+    <label for="email">Email</label>
+    <input id="email" type="email" name="email" placeholder="Email" required autocomplete="email">
+  </div>
+
+  <div class="field">
+    <label for="password">Heslo</label>
+    <input id="password" type="password" name="password" placeholder="Heslo" required autocomplete="new-password">
+
+    <label class="checkbox">
+      <input type="checkbox" id="togglePass">
+      Zobrazit heslo
+    </label>
+  </div>
+
+  <div class="field">
+    <label for="password2">Potvrzení hesla</label>
+    <input id="password2" type="password" name="password2" placeholder="Znovu heslo" required autocomplete="new-password">
+  </div>
+
+  <button type="submit">Registrovat</button>
 </form>
+
+<script>
+  const t = document.getElementById('togglePass');
+  const p1 = document.getElementById('password');
+  const p2 = document.getElementById('password2');
+  if (t && p1 && p2) {
+    t.addEventListener('change', () => {
+      const type = t.checked ? 'text' : 'password';
+      p1.type = type;
+      p2.type = type;
+    });
+  }
+</script>
 {% endblock %}
