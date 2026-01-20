@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Košík • E-shop Dresy{% endblock %}
+{% block content %}
+
+<h2>Košík</h2>
+
+{% if not items %}
+  <p class="muted">Košík je prázdný.</p>
+  <a class="btn" href="{{ url_for('index') }}">Zpět do nabídky</a>
+{% else %}
+
+  <div class="card">
+    <table class="cart-table">
+      <thead>
+        <tr>
+          <th>Produkt</th>
+          <th>Cena</th>
+          <th>Kusů</th>
+          <th>Mezisoučet</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for it in items %}
+        <tr>
+          <td><strong>{{ it.name }}</strong></td>
+          <td>{{ it.price }} Kč</td>
+          <td>
+            <form method="POST" action="{{ url_for('cart_update') }}" class="inline">
+              <input type="hidden" name="product_id" value="{{ it.id }}">
+              <input type="number" name="qty" min="0" value="{{ it.qty }}" class="qty">
+              <button class="btn small ghost" type="submit">Upravit</button>
+            </form>
+          </td>
+          <td><strong>{{ it.price * it.qty }} Kč</strong></td>
+          <td>
+            <form method="POST" action="{{ url_for('cart_remove') }}">
+              <input type="hidden" name="product_id" value="{{ it.id }}">
+              <button class="btn small ghost" type="submit">Odebrat</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <hr>
+
+    <div class="cart-summary">
+      <div class="muted">Celkem</div>
+      <div class="total">{{ total }} Kč</div>
+    </div>
+
+    <div class="cart-actions">
+      <a class="btn ghost" href="{{ url_for('cart_clear') }}">Vyprázdnit</a>
+      <a class="btn" href="{{ url_for('index') }}">Pokračovat v nákupu</a>
+      <button class="btn" type="button" disabled>Pokračovat k objednávce</button>
+    </div>
+  </div>
+
+{% endif %}
+{% endblock %}

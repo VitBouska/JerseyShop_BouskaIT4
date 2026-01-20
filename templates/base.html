@@ -12,6 +12,10 @@
   <nav>
     <a href="{{ url_for('index') }}">Domů</a>
 
+    <a href="{{ url_for('cart') }}">
+        Košík{% if cart_count %} ({{ cart_count }}){% endif %}
+    </a>
+
     {% if session.get("user_id") %}
       <span>Vítej, {{ session["username"] }}</span>
       <a href="{{ url_for('logout') }}">Odhlásit se</a>
