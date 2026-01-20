@@ -258,42 +258,87 @@ def checkout():
 
     if request.method == "POST":
         full_name = request.form.get("full_name", "").strip()
-        email = request.form.get("email", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        phone = request.form.get("phone", "").strip()
         street = request.form.get("street", "").strip()
         city = request.form.get("city", "").strip()
         zip_code = request.form.get("zip_code", "").strip()
-        shipping = request.form.get("shipping")
-        payment = request.form.get("payment")
+        shipping = request.form.get("shipping", "").strip()
+        payment = request.form.get("payment", "").strip()
+        note = request.form.get("note", "").strip()
 
-        # jednoduchá validace
-        if not full_name or not email or not street or not city or not zip_code:
-            flash("Vyplň prosím všechny povinné údaje.", "error")
+        error = None
+        if len(full_name) < 3:
+            error = "Zadej jméno a příjmení."
+        elif not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email):
+            error = "Zadej platný email."
+        elif len(street) < 3 or len(city) < 2 or len(zip_code) < 4:
+            error = "Zadej kompletní adresu (ulice, město, PSČ)."
+        elif shipping not in ("pickup", "courier"):
+            error = "Vyber dopravu."
+        elif payment not in ("card", "cod", "bank"):
+            error = "Vyber platbu."
+
+        if error:
+            flash(error, "error")
             return render_template("checkout.html", items=items, total=total)
 
-        if not shipping or not payment:
-            flash("Vyber dopravu a platbu.", "error")
-            return render_template("checkout.html", items=items, total=total)
+        # Vytvoříme "čekající objednávku" do session
+        order_id = "ORD-" + uuid.uuid4().hex[:8].upper()
+        session["pending_order"] = {
+            "order_id": order_id,
+            "created_at": datetime.now().strftime("%d.%m.%Y %H:%M"),
+            "full_name": full_name,
+            "email": email,
+            "phone": phone,
+            "address": f"{street}, {zip_code} {city}",
+            "shipping": shipping,
+            "payment": payment,
+            "note": note,
+            "items": items,
+            "total": total
+        }
+        session.modified = True
 
-        # ✅ TADY se „potvrdí objednávka“
-        session.pop("cart", None)
-
-        flash(
-            "Váš nákup byl úspěšně potvrzen. Děkujeme za objednávku!",
-            "success"
-        )
-
-        return redirect(url_for("index"))
+        # Přesměrování na fake bránu
+        return redirect(url_for("payment_gateway"))
 
     return render_template("checkout.html", items=items, total=total)
 
 
-@app.route("/order/success")
-def order_success():
-    order = session.get("last_order")
+# -------------------------
+# FAKE PLATEBNI BRANA
+# -------------------------
+
+
+@app.route("/payment", methods=["GET"])
+def payment_gateway():
+    order = session.get("pending_order")
     if not order:
-        flash("Nenalezena žádná poslední objednávka.", "info")
+        flash("Nemáš žádnou rozpracovanou objednávku.", "info")
+        return redirect(url_for("cart"))
+    return render_template("payment.html", order=order)
+
+
+@app.route("/payment/confirm", methods=["POST"])
+def payment_confirm():
+    order = session.get("pending_order")
+    if not order:
+        flash("Objednávka už není k dispozici.", "error")
         return redirect(url_for("index"))
-    return render_template("order_success.html", order=order)
+
+    action = request.form.get("action")
+
+    if action == "pay":
+        # ✅ "Platba úspěšná": potvrdíme nákup
+        session.pop("cart", None)
+        session.pop("pending_order", None)
+        flash(f"Platba proběhla úspěšně. Váš nákup je potvrzen (#{order['order_id']}).", "success")
+        return redirect(url_for("index"))
+
+    # ❌ "Platba zrušena"
+    flash("Platba byla zrušena. Objednávka nebyla dokončena.", "error")
+    return redirect(url_for("checkout"))
 
 
 # -------------------------

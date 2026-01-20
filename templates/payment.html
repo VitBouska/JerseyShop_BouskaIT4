@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Platba • E-shop dresy{% endblock %}
+
+{% block content %}
+
+<h2>Falešná platební brána</h2>
+<p class="muted">Toto je simulace platby (pro školní projekt).</p>
+
+<div class="checkout-grid">
+  <div class="card">
+    <h3 class="section-title">Souhrn platby</h3>
+
+    <div class="summary-list">
+        {% for it in order["items"] %}
+            <div class="summary-item">
+                <div>
+                    <strong>{{ it.name }}</strong>
+                    <div class="muted">{{ it.qty }}× {{ it.price }} Kč</div>
+                </div>
+                <div><strong>{{ it.qty * it.price }} Kč</strong></div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <div class="summary-total">
+      <div class="muted">Celkem</div>
+      <div class="total">{{ order.total }} Kč</div>
+    </div>
+
+    <p class="muted small" style="margin-top:10px;">
+      Objednávka: <strong>#{{ order.order_id }}</strong><br>
+      Platba: <strong>
+        {% if order.payment == 'card' %}Karta{% elif order.payment == 'bank' %}Převod{% else %}Dobírka{% endif %}
+      </strong>
+    </p>
+  </div>
+
+  <div class="card">
+    <h3 class="section-title">Zvol akci</h3>
+    <p class="muted">Klikni na „Zaplatit“ pro úspěšnou platbu nebo „Zrušit“ pro simulaci neúspěchu.</p>
+
+    <form method="POST" action="{{ url_for('payment_confirm') }}" class="pay-actions">
+      <button class="btn" name="action" value="pay" type="submit">Zaplatit</button>
+      <button class="btn ghost" name="action" value="cancel" type="submit">Zrušit platbu</button>
+    </form>
+
+    <hr>
+
+    <a class="btn ghost" href="{{ url_for('checkout') }}">Zpět na údaje</a>
+  </div>
+</div>
+
+{% endblock %}
