@@ -239,6 +239,10 @@ def cart_clear():
     return redirect(url_for("cart"))
 
 
+# -------------------------
+# CHECKOUT
+# -------------------------
+
 import uuid
 from datetime import datetime
 
@@ -249,61 +253,36 @@ def checkout():
     total = _cart_total()
 
     if not items:
-        flash("Košík je prázdný – nelze pokračovat k objednávce.", "error")
+        flash("Košík je prázdný.", "error")
         return redirect(url_for("cart"))
 
     if request.method == "POST":
         full_name = request.form.get("full_name", "").strip()
-        email = request.form.get("email", "").strip().lower()
-        phone = request.form.get("phone", "").strip()
+        email = request.form.get("email", "").strip()
         street = request.form.get("street", "").strip()
         city = request.form.get("city", "").strip()
         zip_code = request.form.get("zip_code", "").strip()
-        shipping = request.form.get("shipping", "").strip()
-        payment = request.form.get("payment", "").strip()
-        note = request.form.get("note", "").strip()
+        shipping = request.form.get("shipping")
+        payment = request.form.get("payment")
 
-        # jednoduché validace
-        error = None
-        if len(full_name) < 3:
-            error = "Zadej jméno a příjmení."
-        elif not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email):
-            error = "Zadej platný email."
-        elif len(street) < 3 or len(city) < 2 or len(zip_code) < 4:
-            error = "Zadej kompletní adresu (ulice, město, PSČ)."
-        elif shipping not in ("pickup", "courier"):
-            error = "Vyber dopravu."
-        elif payment not in ("card", "cod", "bank"):
-            error = "Vyber platbu."
+        # jednoduchá validace
+        if not full_name or not email or not street or not city or not zip_code:
+            flash("Vyplň prosím všechny povinné údaje.", "error")
+            return render_template("checkout.html", items=items, total=total)
 
-        if error:
-            flash(error, "error")
-            return render_template(
-                "checkout.html",
-                items=items,
-                total=total
-            )
+        if not shipping or not payment:
+            flash("Vyber dopravu a platbu.", "error")
+            return render_template("checkout.html", items=items, total=total)
 
-        # “vytvoření objednávky” (jen v session)
-        order_id = "ORD-" + uuid.uuid4().hex[:8].upper()
-        order = {
-            "order_id": order_id,
-            "created_at": datetime.now().strftime("%d.%m.%Y %H:%M"),
-            "full_name": full_name,
-            "email": email,
-            "phone": phone,
-            "address": f"{street}, {zip_code} {city}",
-            "shipping": shipping,
-            "payment": payment,
-            "note": note,
-            "items": items,
-            "total": total,
-        }
+        # ✅ TADY se „potvrdí objednávka“
+        session.pop("cart", None)
 
-        session["last_order"] = order
-        session.pop("cart", None)  # vyprázdnit košík
-        flash("Objednávka byla odeslána.", "success")
-        return redirect(url_for("order_success"))
+        flash(
+            "Váš nákup byl úspěšně potvrzen. Děkujeme za objednávku!",
+            "success"
+        )
+
+        return redirect(url_for("index"))
 
     return render_template("checkout.html", items=items, total=total)
 
