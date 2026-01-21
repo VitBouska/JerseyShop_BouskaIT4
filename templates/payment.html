@@ -7,19 +7,27 @@
 <p class="muted">Toto je simulace platby (pro školní projekt).</p>
 
 <div class="checkout-grid">
+  <!-- Souhrn objednávky -->
   <div class="card">
-    <h3 class="section-title">Souhrn platby</h3>
+    <h3 class="section-title">Souhrn objednávky</h3>
+
+    <div class="order-meta">
+      <div><span class="muted">Číslo objednávky:</span> <strong>{{ order.order_code }}</strong></div>
+      <div><span class="muted">Vytvořeno:</span> <strong>{{ order.created_at.strftime("%d.%m.%Y %H:%M") }}</strong></div>
+    </div>
+
+    <hr>
 
     <div class="summary-list">
-        {% for it in order["items"] %}
-            <div class="summary-item">
-                <div>
-                    <strong>{{ it.name }}</strong>
-                    <div class="muted">{{ it.qty }}× {{ it.price }} Kč</div>
-                </div>
-                <div><strong>{{ it.qty * it.price }} Kč</strong></div>
-            </div>
-        {% endfor %}
+      {% for it in order.items %}
+        <div class="summary-item">
+          <div>
+            <strong>{{ it.name }}</strong>
+            <div class="muted">{{ it.qty }}× {{ it.price }} Kč</div>
+          </div>
+          <div><strong>{{ it.qty * it.price }} Kč</strong></div>
+        </div>
+      {% endfor %}
     </div>
 
     <hr>
@@ -30,13 +38,18 @@
     </div>
 
     <p class="muted small" style="margin-top:10px;">
-      Objednávka: <strong>#{{ order.order_id }}</strong><br>
-      Platba: <strong>
+      Platba:
+      <strong>
         {% if order.payment == 'card' %}Karta{% elif order.payment == 'bank' %}Převod{% else %}Dobírka{% endif %}
+      </strong><br>
+      Doprava:
+      <strong>
+        {% if order.shipping == 'pickup' %}Osobní odběr{% else %}Kurýr{% endif %}
       </strong>
     </p>
   </div>
 
+  <!-- Akce -->
   <div class="card">
     <h3 class="section-title">Zvol akci</h3>
     <p class="muted">Klikni na „Zaplatit“ pro úspěšnou platbu nebo „Zrušit“ pro simulaci neúspěchu.</p>

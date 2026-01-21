@@ -5,8 +5,10 @@ from flask import (
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+from datetime import datetime
 import re
 import os
+import uuid
 
 app = Flask(__name__)
 
@@ -31,6 +33,47 @@ class User(db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)  # 255 kvůli délce hashů
+
+
+class Order(db.Model):
+    __tablename__ = "orders123"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users123.id"), nullable=False)
+    user = db.relationship("User", backref=db.backref("orders", lazy=True))
+
+    order_code = db.Column(db.String(32), unique=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    full_name = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    phone = db.Column(db.String(50))
+    address = db.Column(db.String(255), nullable=False)
+
+    shipping = db.Column(db.String(20), nullable=False)  # pickup/courier
+    payment = db.Column(db.String(20), nullable=False)   # card/bank/cod
+    note = db.Column(db.String(255))
+
+    total = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.String(20), default="pending", nullable=False)  # pending/paid/canceled
+
+
+class OrderItem(db.Model):
+    __tablename__ = "order_items123"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    order_id = db.Column(db.Integer, db.ForeignKey("orders123.id"), nullable=False)
+    order = db.relationship(
+        "Order",
+        backref=db.backref("items", lazy=True, cascade="all, delete-orphan")
+    )
+
+    product_id = db.Column(db.String(32), nullable=False)
+    name = db.Column(db.String(120), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+    qty = db.Column(db.Integer, nullable=False)
 
 
 # -------------------------
@@ -70,7 +113,6 @@ def _cart_total():
 
 @app.context_processor
 def inject_cart():
-    # v šablonách můžeš použít {{ cart_count }}
     return {"cart_count": _cart_count()}
 
 
@@ -159,17 +201,13 @@ def logout():
     flash("Byl(a) jste odhlášen(a).", "info")
     return redirect(url_for("index"))
 
+
 # -------------------------
 # PROFIL
 # -------------------------
-
 @app.route("/profile")
+@login_required
 def profile():
-    if not session.get("user_id"):
-        flash("Nejprve se přihlas.", "error")
-        return redirect(url_for("login"))
-
-    # volitelně: můžeš si načíst data z DB (zatím stačí session)
     user = {
         "id": session.get("user_id"),
         "username": session.get("username"),
@@ -257,13 +295,10 @@ def cart_clear():
 
 
 # -------------------------
-# CHECKOUT
+# CHECKOUT (DB objednávka)
 # -------------------------
-
-import uuid
-from datetime import datetime
-
 @app.route("/checkout", methods=["GET", "POST"])
+@login_required
 def checkout():
     cart = _get_cart()
     items = list(cart["items"].values())
@@ -273,103 +308,126 @@ def checkout():
         flash("Košík je prázdný.", "error")
         return redirect(url_for("cart"))
 
-    if request.method == "POST":
-        full_name = request.form.get("full_name", "").strip()
-        email = request.form.get("email", "").strip().lower()
-        phone = request.form.get("phone", "").strip()
-        street = request.form.get("street", "").strip()
-        city = request.form.get("city", "").strip()
-        zip_code = request.form.get("zip_code", "").strip()
-        shipping = request.form.get("shipping", "").strip()
-        payment = request.form.get("payment", "").strip()
-        note = request.form.get("note", "").strip()
+    if request.method == "GET":
+        return render_template("checkout.html", items=items, total=total)
 
-        error = None
-        if len(full_name) < 3:
-            error = "Zadej jméno a příjmení."
-        elif not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email):
-            error = "Zadej platný email."
-        elif len(street) < 3 or len(city) < 2 or len(zip_code) < 4:
-            error = "Zadej kompletní adresu (ulice, město, PSČ)."
-        elif shipping not in ("pickup", "courier"):
-            error = "Vyber dopravu."
-        elif payment not in ("card", "cod", "bank"):
-            error = "Vyber platbu."
+    # POST – načteme data z formuláře
+    full_name = request.form.get("full_name", "").strip()
+    email = request.form.get("email", "").strip()
+    phone = request.form.get("phone", "").strip()
 
-        if error:
-            flash(error, "error")
-            return render_template("checkout.html", items=items, total=total)
+    street = request.form.get("street", "").strip()
+    city = request.form.get("city", "").strip()
+    zip_code = request.form.get("zip_code", "").strip()
 
-        # Vytvoříme "čekající objednávku" do session
-        order_id = "ORD-" + uuid.uuid4().hex[:8].upper()
-        session["pending_order"] = {
-            "order_id": order_id,
-            "created_at": datetime.now().strftime("%d.%m.%Y %H:%M"),
-            "full_name": full_name,
-            "email": email,
-            "phone": phone,
-            "address": f"{street}, {zip_code} {city}",
-            "shipping": shipping,
-            "payment": payment,
-            "note": note,
-            "items": items,
-            "total": total
-        }
-        session.modified = True
+    shipping = request.form.get("shipping", "").strip()
+    payment = request.form.get("payment", "").strip()
+    note = request.form.get("note", "").strip()
 
-        # Přesměrování na fake bránu
-        return redirect(url_for("payment_gateway"))
+    # jednoduchá validace
+    if not full_name or not email or not street or not city or not zip_code or not shipping or not payment:
+        flash("Vyplň prosím všechny povinné údaje.", "error")
+        return render_template("checkout.html", items=items, total=total)
 
-    return render_template("checkout.html", items=items, total=total)
+    # vytvoření objednávky v DB (pending)
+    order_code = "ORD-" + uuid.uuid4().hex[:8].upper()
+
+    o = Order(
+        user_id=session["user_id"],
+        order_code=order_code,
+        full_name=full_name,
+        email=email,
+        phone=phone or None,
+        address=f"{street}, {zip_code} {city}",
+        shipping=shipping,
+        payment=payment,
+        note=note or None,
+        total=total,
+        status="pending",
+    )
+    db.session.add(o)
+    db.session.flush()  # získáme o.id ještě před commitem
+
+    for it in items:
+        db.session.add(OrderItem(
+            order_id=o.id,
+            product_id=str(it["id"]),
+            name=it["name"],
+            price=int(it["price"]),
+            qty=int(it["qty"]),
+        ))
+
+    db.session.commit()
+
+    session["pending_order_id"] = o.id
+    session.modified = True
+
+    return redirect(url_for("payment_gateway"))
 
 
 # -------------------------
-# FAKE PLATEBNI BRANA
+# FAKE PLATEBNÍ BRÁNA
 # -------------------------
-
-
 @app.route("/payment", methods=["GET"])
+@login_required
 def payment_gateway():
-    order = session.get("pending_order")
-    if not order:
+    order_id = session.get("pending_order_id")
+    if not order_id:
         flash("Nemáš žádnou rozpracovanou objednávku.", "info")
         return redirect(url_for("cart"))
+
+    order = Order.query.filter_by(id=order_id, user_id=session["user_id"]).first()
+    if not order:
+        flash("Objednávka nebyla nalezena.", "error")
+        session.pop("pending_order_id", None)
+        return redirect(url_for("cart"))
+
     return render_template("payment.html", order=order)
 
 
 @app.route("/payment/confirm", methods=["POST"])
+@login_required
 def payment_confirm():
-    order = session.get("pending_order")
-    if not order:
+    order_id = session.get("pending_order_id")
+    if not order_id:
         flash("Objednávka už není k dispozici.", "error")
+        return redirect(url_for("index"))
+
+    order = Order.query.filter_by(id=order_id, user_id=session["user_id"]).first()
+    if not order:
+        flash("Objednávka nebyla nalezena.", "error")
+        session.pop("pending_order_id", None)
         return redirect(url_for("index"))
 
     action = request.form.get("action")
 
     if action == "pay":
-        # ✅ uložit do historie objednávek (v session)
-        orders = session.get("orders", [])
-        confirmed = dict(order)  # kopie, ať se to nerozbije po popu pending_order
-        confirmed["status"] = "paid"
-        orders.insert(0, confirmed)  # nejnovější nahoře
-        session["orders"] = orders
+        order.status = "paid"
+        db.session.commit()
 
-        # ✅ potvrzení nákupu
         session.pop("cart", None)
-        session.pop("pending_order", None)
+        session.pop("pending_order_id", None)
         session.modified = True
 
-        flash(f"Platba proběhla úspěšně. Váš nákup je potvrzen (#{order['order_id']}).", "success")
+        flash(f"Platba proběhla úspěšně. Váš nákup je potvrzen (#{order.order_code}).", "success")
         return redirect(url_for("orders"))
 
-    # ❌ "Platba zrušena"
     flash("Platba byla zrušena. Objednávka nebyla dokončena.", "error")
     return redirect(url_for("checkout"))
 
+
+# -------------------------
+# PŘEHLED OBJEDNÁVEK (DB)
+# -------------------------
 @app.route("/orders")
 @login_required
 def orders():
-    orders_list = session.get("orders", [])
+    orders_list = (
+        Order.query
+        .filter_by(user_id=session["user_id"])
+        .order_by(Order.created_at.desc())
+        .all()
+    )
     return render_template("orders.html", orders=orders_list)
 
 
@@ -379,4 +437,4 @@ def orders():
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)
