@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}{{ p.name }} • E-shop Dresy{% endblock %}
+
+{% block content %}
+<div class="checkout-grid">
+  <div class="card">
+    {% if p.image_url %}
+      <img src="{{ p.image_url }}" alt="{{ p.name }}" style="width:100%; border-radius:12px; display:block;">
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2 style="margin-bottom:6px;">{{ p.name }}</h2>
+    <p class="muted" style="margin-top:0;">Sezóna: {{ p.season }}</p>
+
+    <div class="summary-total" style="margin-top:10px;">
+      <div class="muted">Cena</div>
+      <div class="total">{{ p.price }} Kč</div>
+    </div>
+
+    <hr>
+
+    <form method="POST" action="{{ url_for('cart_add') }}">
+      <input type="hidden" name="product_id" value="{{ p.id }}">
+      <input type="hidden" name="name" value="{{ p.name }}">
+      <input type="hidden" name="price" value="{{ p.price }}">
+
+      <div class="field">
+        <label for="size">Velikost (skladem)</label>
+        <select id="size" name="size" required>
+          <option value="" disabled selected>Vyber velikost</option>
+          {% for s in p.stock_sizes %}
+            <option value="{{ s }}">{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="number">Číslo / jméno (skladem)</label>
+        <select id="number" name="number" required>
+          <option value="" disabled selected>Vyber číslo</option>
+          {% for n in p.stock_numbers %}
+            <option value="{{ n }}">{{ n }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <button class="btn" type="submit">Přidat do košíku</button>
+      <a class="btn ghost" href="{{ url_for('index') }}">Zpět</a>
+    </form>
+
+    <p class="muted small" style="margin-top:10px;">
+      (Demo) Velikosti a čísla jsou jen ukázkové pro školní projekt.
+    </p>
+  </div>
+</div>
+{% endblock %}

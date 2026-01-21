@@ -571,3 +571,20 @@ input:focus, select:focus{
 nav{
   margin-top: 12px;
 }
+
+/* ====== DOPLŇKY PRO DETAIL PRODUKTU + KLIKÁNÍ ====== */
+.product-card img,
+.product-card h3{
+  cursor: pointer;
+}
+
+/* Detail layout (když použiješ "checkout-grid" v product.html, je to OK)
+   Pokud chceš speciálně pro detail: */
+.product-hero{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:14px;
+}
+@media (max-width: 900px){
+  .product-hero{ grid-template-columns: 1fr; }
+}

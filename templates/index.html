@@ -3,7 +3,6 @@
 
 {% block content %}
 
-<!-- FILTRY -->
 <section class="filters card">
   <div class="filters-row">
     <div class="field">
@@ -41,213 +40,53 @@
 
     <div class="field">
       <label>Max cena</label>
-      <input id="maxPrice" type="number" placeholder="3000">
+      <input id="maxPrice" type="number" placeholder="2500">
     </div>
 
     <div class="field">
       <label>&nbsp;</label>
-      <button id="resetFilters" class="btn ghost" type="button">Reset</button>
+      <button id="reset" class="btn ghost" type="button">Reset</button>
     </div>
   </div>
 </section>
 
-<!-- PRODUKTY -->
 <div class="products" id="products">
+  {% for p in products %}
+    <div class="product-card"
+         data-name="{{ p.name }}"
+         data-team="{{ p.team_key }}"
+         data-type="{{ p.type_key }}"
+         data-price="{{ p.price }}">
 
-  <!-- 1 -->
-  <div class="product-card" data-name="Manchester City domácí" data-team="mancity" data-type="home" data-price="1799">
-    <img src="{{ url_for('static', filename='img/mancity_home.png') }}" alt="Manchester City domácí">
-    <h3>Manchester City – domácí</h3>
-    <div class="price">1 799 Kč</div>
-    <form method="POST" action="{{ url_for('cart_add') }}">
-      <input type="hidden" name="product_id" value="1">
-      <input type="hidden" name="name" value="Manchester City – domácí">
-      <input type="hidden" name="price" value="1799">
-      <button class="btn" type="submit">Do košíku</button>
-    </form>
-  </div>
+      {% if p.badge %}
+        <div class="badge">{{ p.badge }}</div>
+      {% endif %}
 
-  <!-- 2 -->
-  <div class="product-card" data-name="Manchester City venkovní" data-team="mancity" data-type="away" data-price="1699">
-    <img src="{{ url_for('static', filename='img/mancity_away.png') }}" alt="Manchester City venkovní">
-    <h3>Manchester City – venkovní</h3>
-    <div class="price">1 699 Kč</div>
-    <form method="POST" action="{{ url_for('cart_add') }}">
-      <input type="hidden" name="product_id" value="2">
-      <input type="hidden" name="name" value="Manchester City – venkovní">
-      <input type="hidden" name="price" value="1699">
-      <button class="btn" type="submit">Do košíku</button>
-    </form>
-  </div>
+      <a class="product-link" href="{{ url_for('product_detail', product_id=p.id) }}">
+        {% if p.image_url %}
+          <img src="{{ p.image_url }}" alt="{{ p.name }}">
+        {% endif %}
+        <h3>{{ p.name }}</h3>
+      </a>
 
-  <!-- 3 SLEVA -->
-  <div class="product-card" data-name="Real Madrid domácí" data-team="realmadrid" data-type="home" data-price="1899">
-    <div class="badge">-14%</div>
-    <img src="{{ url_for('static', filename='img/realmadrid_home.png') }}" alt="Real Madrid domácí">
-    <h3>Real Madrid – domácí</h3>
-    <div class="price-wrap">
-      <span class="old-price">2 199 Kč</span>
-      <span class="price">1 899 Kč</span>
+      <p class="muted small">{{ p.season }}</p>
+
+      <div class="price-wrap">
+          {% if p.old_price %}
+            <span class="old-price">{{ p.old_price }} Kč</span>
+          {% endif %}
+          <span class="price">{{ p.price }} Kč</span>
+      </div>
+
+      <form method="POST" action="{{ url_for('cart_add') }}">
+        <input type="hidden" name="product_id" value="{{ p.id }}">
+        <input type="hidden" name="name" value="{{ p.name }}">
+        <input type="hidden" name="price" value="{{ p.price }}">
+        <button class="btn" type="submit">Do košíku</button>
+      </form>
+
     </div>
-    <form method="POST" action="{{ url_for('cart_add') }}">
-      <input type="hidden" name="product_id" value="3">
-      <input type="hidden" name="name" value="Real Madrid – domácí">
-      <input type="hidden" name="price" value="1899">
-      <button class="btn" type="submit">Do košíku</button>
-    </form>
-  </div>
-
-  <!-- 4 -->
-  <div class="product-card" data-name="Real Madrid venkovní" data-team="realmadrid" data-type="away" data-price="1799">
-    <img src="{{ url_for('static', filename='img/realmadrid_away.png') }}" alt="Real Madrid venkovní">
-    <h3>Real Madrid – venkovní</h3>
-    <div class="price">1 799 Kč</div>
-    <form method="POST" action="{{ url_for('cart_add') }}">
-      <input type="hidden" name="product_id" value="4">
-      <input type="hidden" name="name" value="Real Madrid – venkovní">
-      <input type="hidden" name="price" value="1799">
-      <button class="btn" type="submit">Do košíku</button>
-    </form>
-  </div>
-
-  <!-- 5 -->
-  <div class="product-card" data-name="Barcelona domácí" data-team="barcelona" data-type="home" data-price="1899">
-    <img src="{{ url_for('static', filename='img/barcelona_home.png') }}" alt="Barcelona domácí">
-    <h3>FC Barcelona – domácí</h3>
-    <div class="price">1 899 Kč</div>
-    <form method="POST" action="{{ url_for('cart_add') }}">
-      <input type="hidden" name="product_id" value="5">
-      <input type="hidden" name="name" value="FC Barcelona – domácí">
-      <input type="hidden" name="price" value="1899">
-      <button class="btn" type="submit">Do košíku</button>
-    </form>
-  </div>
-
-  <!-- 6 -->
-  <div class="product-card" data-name="Barcelona venkovní" data-team="barcelona" data-type="away" data-price="1749">
-    <img src="{{ url_for('static', filename='img/barcelona_away.png') }}" alt="Barcelona venkovní">
-    <h3>FC Barcelona – venkovní</h3>
-    <div class="price">1 749 Kč</div>
-    <form method="POST" action="{{ url_for('cart_add') }}">
-      <input type="hidden" name="product_id" value="6">
-      <input type="hidden" name="name" value="FC Barcelona – venkovní">
-      <input type="hidden" name="price" value="1749">
-      <button class="btn" type="submit">Do košíku</button>
-    </form>
-  </div>
-
-  <!-- 7 SLEVA -->
-  <div class="product-card" data-name="Bayern domácí" data-team="bayern" data-type="home" data-price="1899">
-    <div class="badge">-21%</div>
-    <img src="{{ url_for('static', filename='img/bayern_home.png') }}" alt="Bayern domácí">
-    <h3>Bayern Mnichov – domácí</h3>
-    <div class="price-wrap">
-      <span class="old-price">2 399 Kč</span>
-      <span class="price">1 899 Kč</span>
-    </div>
-    <form method="POST" action="{{ url_for('cart_add') }}">
-      <input type="hidden" name="product_id" value="7">
-      <input type="hidden" name="name" value="Bayern Mnichov – domácí">
-      <input type="hidden" name="price" value="1899">
-      <button class="btn" type="submit">Do košíku</button>
-    </form>
-  </div>
-
-  <!-- 8 -->
-  <div class="product-card" data-name="Bayern venkovní" data-team="bayern" data-type="away" data-price="1799">
-    <img src="{{ url_for('static', filename='img/bayern_away.png') }}" alt="Bayern venkovní">
-    <h3>Bayern Mnichov – venkovní</h3>
-    <div class="price">1 799 Kč</div>
-    <form method="POST" action="{{ url_for('cart_add') }}">
-      <input type="hidden" name="product_id" value="8">
-      <input type="hidden" name="name" value="Bayern Mnichov – venkovní">
-      <input type="hidden" name="price" value="1799">
-      <button class="btn" type="submit">Do košíku</button>
-    </form>
-  </div>
-
-  <!-- 9 -->
-  <div class="product-card" data-name="PSG domácí" data-team="psg" data-type="home" data-price="1899">
-    <img src="{{ url_for('static', filename='img/psg_home.png') }}" alt="PSG domácí">
-    <h3>PSG – domácí</h3>
-    <div class="price">1 899 Kč</div>
-    <form method="POST" action="{{ url_for('cart_add') }}">
-      <input type="hidden" name="product_id" value="9">
-      <input type="hidden" name="name" value="PSG – domácí">
-      <input type="hidden" name="price" value="1899">
-      <button class="btn" type="submit">Do košíku</button>
-    </form>
-  </div>
-
-  <!-- 10 -->
-  <div class="product-card" data-name="PSG venkovní" data-team="psg" data-type="away" data-price="1799">
-    <img src="{{ url_for('static', filename='img/psg_away.png') }}" alt="PSG venkovní">
-    <h3>PSG – venkovní</h3>
-    <div class="price">1 799 Kč</div>
-    <form method="POST" action="{{ url_for('cart_add') }}">
-      <input type="hidden" name="product_id" value="10">
-      <input type="hidden" name="name" value="PSG – venkovní">
-      <input type="hidden" name="price" value="1799">
-      <button class="btn" type="submit">Do košíku</button>
-    </form>
-  </div>
-
-  <!-- 11 SLEVA -->
-  <div class="product-card" data-name="Arsenal domácí" data-team="arsenal" data-type="home" data-price="1699">
-    <div class="badge">-15%</div>
-    <img src="{{ url_for('static', filename='img/arsenal_home.png') }}" alt="Arsenal domácí">
-    <h3>Arsenal – domácí</h3>
-    <div class="price-wrap">
-      <span class="old-price">1 999 Kč</span>
-      <span class="price">1 699 Kč</span>
-    </div>
-    <form method="POST" action="{{ url_for('cart_add') }}">
-      <input type="hidden" name="product_id" value="11">
-      <input type="hidden" name="name" value="Arsenal – domácí">
-      <input type="hidden" name="price" value="1699">
-      <button class="btn" type="submit">Do košíku</button>
-    </form>
-  </div>
-
-  <!-- 12 -->
-  <div class="product-card" data-name="Arsenal venkovní" data-team="arsenal" data-type="away" data-price="1599">
-    <img src="{{ url_for('static', filename='img/arsenal_away.png') }}" alt="Arsenal venkovní">
-    <h3>Arsenal – venkovní</h3>
-    <div class="price">1 599 Kč</div>
-    <form method="POST" action="{{ url_for('cart_add') }}">
-      <input type="hidden" name="product_id" value="12">
-      <input type="hidden" name="name" value="Arsenal – venkovní">
-      <input type="hidden" name="price" value="1599">
-      <button class="btn" type="submit">Do košíku</button>
-    </form>
-  </div>
-
-  <!-- 13 -->
-  <div class="product-card" data-name="Juventus domácí" data-team="juventus" data-type="home" data-price="1749">
-    <img src="{{ url_for('static', filename='img/juventus_home.png') }}" alt="Juventus domácí">
-    <h3>Juventus – domácí</h3>
-    <div class="price">1 749 Kč</div>
-    <form method="POST" action="{{ url_for('cart_add') }}">
-      <input type="hidden" name="product_id" value="13">
-      <input type="hidden" name="name" value="Juventus – domácí">
-      <input type="hidden" name="price" value="1749">
-      <button class="btn" type="submit">Do košíku</button>
-    </form>
-  </div>
-
-  <!-- 14 -->
-  <div class="product-card" data-name="Juventus venkovní" data-team="juventus" data-type="away" data-price="1649">
-    <img src="{{ url_for('static', filename='img/juventus_away.png') }}" alt="Juventus venkovní">
-    <h3>Juventus – venkovní</h3>
-    <div class="price">1 649 Kč</div>
-    <form method="POST" action="{{ url_for('cart_add') }}">
-      <input type="hidden" name="product_id" value="14">
-      <input type="hidden" name="name" value="Juventus – venkovní">
-      <input type="hidden" name="price" value="1649">
-      <button class="btn" type="submit">Do košíku</button>
-    </form>
-  </div>
-
+  {% endfor %}
 </div>
 
 <script>
@@ -256,13 +95,14 @@ const team = document.getElementById('team');
 const type = document.getElementById('type');
 const minPrice = document.getElementById('minPrice');
 const maxPrice = document.getElementById('maxPrice');
-const reset = document.getElementById('resetFilters');
-const cards = document.querySelectorAll('.product-card');
+const reset = document.getElementById('reset');
+const cards = Array.from(document.querySelectorAll('.product-card'));
 
 function filter(){
+  const text = (q.value || '').toLowerCase().trim();
   cards.forEach(c=>{
     const ok =
-      (!q.value || c.dataset.name.toLowerCase().includes(q.value.toLowerCase())) &&
+      (!text || c.dataset.name.toLowerCase().includes(text)) &&
       (!team.value || c.dataset.team === team.value) &&
       (!type.value || c.dataset.type === type.value) &&
       (!minPrice.value || +c.dataset.price >= +minPrice.value) &&

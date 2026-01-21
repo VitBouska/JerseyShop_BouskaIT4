@@ -23,7 +23,16 @@
       <tbody>
         {% for it in items %}
         <tr>
-          <td><strong>{{ it.name }}</strong></td>
+          <td>
+  <strong>{{ it.name }}</strong>
+  {% if it.size or it.number %}
+    <div class="muted small">
+      {% if it.size %}Velikost: {{ it.size }}{% endif %}
+      {% if it.size and it.number %} • {% endif %}
+      {% if it.number %}Číslo: {{ it.number }}{% endif %}
+    </div>
+  {% endif %}
+</td>
           <td>{{ it.price }} Kč</td>
           <td>
             <form method="POST" action="{{ url_for('cart_update') }}" class="inline">
