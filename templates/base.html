@@ -24,9 +24,11 @@
   <a href="{{ url_for('cart') }}">Košík{% if cart_count %} ({{ cart_count }}){% endif %}</a>
 
   {% if session.get("user_id") %}
-    <span class="pill">Vítej, {{ session["username"] }}</span>
-    <a href="{{ url_for('logout') }}">Odhlásit se</a>
-  {% else %}
+  <span class="pill">Vítej, {{ session["username"] }}</span>
+  <a href="{{ url_for('profile') }}">Profil</a>
+      <a href="{{ url_for('orders') }}">Objednávky</a>
+  <a href="{{ url_for('logout') }}">Odhlásit se</a>
+{% else %}
     <a href="{{ url_for('login') }}">Přihlášení</a>
     <a href="{{ url_for('register') }}">Registrace</a>
   {% endif %}

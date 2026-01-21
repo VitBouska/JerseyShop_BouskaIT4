@@ -159,6 +159,23 @@ def logout():
     flash("Byl(a) jste odhlášen(a).", "info")
     return redirect(url_for("index"))
 
+# -------------------------
+# PROFIL
+# -------------------------
+
+@app.route("/profile")
+def profile():
+    if not session.get("user_id"):
+        flash("Nejprve se přihlas.", "error")
+        return redirect(url_for("login"))
+
+    # volitelně: můžeš si načíst data z DB (zatím stačí session)
+    user = {
+        "id": session.get("user_id"),
+        "username": session.get("username"),
+    }
+    return render_template("profile.html", user=user)
+
 
 # -------------------------
 # CART ROUTES
@@ -330,15 +347,30 @@ def payment_confirm():
     action = request.form.get("action")
 
     if action == "pay":
-        # ✅ "Platba úspěšná": potvrdíme nákup
+        # ✅ uložit do historie objednávek (v session)
+        orders = session.get("orders", [])
+        confirmed = dict(order)  # kopie, ať se to nerozbije po popu pending_order
+        confirmed["status"] = "paid"
+        orders.insert(0, confirmed)  # nejnovější nahoře
+        session["orders"] = orders
+
+        # ✅ potvrzení nákupu
         session.pop("cart", None)
         session.pop("pending_order", None)
+        session.modified = True
+
         flash(f"Platba proběhla úspěšně. Váš nákup je potvrzen (#{order['order_id']}).", "success")
-        return redirect(url_for("index"))
+        return redirect(url_for("orders"))
 
     # ❌ "Platba zrušena"
     flash("Platba byla zrušena. Objednávka nebyla dokončena.", "error")
     return redirect(url_for("checkout"))
+
+@app.route("/orders")
+@login_required
+def orders():
+    orders_list = session.get("orders", [])
+    return render_template("orders.html", orders=orders_list)
 
 
 # -------------------------

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Profil • E-shop Dresy{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>Profil</h2>
+  <p class="muted">Tvoje údaje v tomto demo e-shopu.</p>
+
+  <div class="order-meta">
+    <div><span class="muted">Uživatel:</span> <strong>{{ user.username }}</strong></div>
+    <div><span class="muted">ID:</span> <strong>{{ user.id }}</strong></div>
+  </div>
+
+  <hr>
+
+  <div class="cart-actions">
+    <a class="btn ghost" href="{{ url_for('index') }}">Zpět do obchodu</a>
+    <a class="btn" href="{{ url_for('logout') }}">Odhlásit se</a>
+  </div>
+</div>
+{% endblock %}
