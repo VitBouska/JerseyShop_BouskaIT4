@@ -2,6 +2,7 @@
 {% block title %}Profil • E-shop Dresy{% endblock %}
 
 {% block content %}
+
 <div class="card">
   <h2>Profil</h2>
   <p class="muted">Tvoje údaje v tomto demo e-shopu.</p>
@@ -18,4 +19,228 @@
     <a class="btn" href="{{ url_for('logout') }}">Odhlásit se</a>
   </div>
 </div>
+
+<div class="card" style="margin-top:14px;">
+  <h3 class="section-title">Kolo štěstí 🎡</h3>
+  <p class="muted">Jednou za 24 hodin si můžeš vytočit slevu 0–20 % na objednávku.</p>
+
+  {% if active_discount is not none %}
+    <div class="order-meta" style="margin-top:10px;">
+      <div><span class="muted">Aktivní sleva:</span> <strong>{{ active_discount }} %</strong></div>
+      <div class="muted small">Použije se automaticky v checkoutu.</div>
+    </div>
+    <p class="muted small" style="margin-top:8px; line-height:1.35;">
+      Dokud slevu nevyužiješ, další točení je vypnuté.
+    </p>
+  {% endif %}
+
+  <div class="card" style="margin-top:10px;">
+    <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap; justify-content:center;">
+
+      <div style="position:relative; width:320px; height:320px;">
+        <!-- šipka -->
+        <div style="
+          position:absolute; top:-10px; left:50%; transform:translateX(-50%);
+          width:0; height:0;
+          border-left:14px solid transparent;
+          border-right:14px solid transparent;
+          border-bottom:22px solid rgba(0,0,0,.8);
+          filter: drop-shadow(0 2px 2px rgba(0,0,0,.25));
+          z-index:2;
+        "></div>
+
+        <canvas id="wheelCanvas" width="320" height="320"
+          style="border-radius:50%; box-shadow:0 10px 25px rgba(0,0,0,.12); background:#fff;">
+        </canvas>
+
+        <!-- střed -->
+        <div style="
+          position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+          pointer-events:none;
+        ">
+          <div style="
+            width:74px; height:74px; border-radius:50%;
+            background: radial-gradient(circle at 30% 30%, #fff, #e9e9e9);
+            box-shadow: inset 0 2px 6px rgba(0,0,0,.15), 0 6px 14px rgba(0,0,0,.12);
+            display:flex; align-items:center; justify-content:center;
+            font-weight:800;
+          ">SPIN</div>
+        </div>
+      </div>
+
+      <div style="min-width:260px; max-width:360px;">
+        <div id="wheelResult" class="muted" style="margin-bottom:10px;"></div>
+
+        <button id="spinBtn" class="btn" {% if not can_spin %}disabled{% endif %}>
+          {% if can_spin %}Točit kolo{% else %}Nelze točit{% endif %}
+        </button>
+
+        <div id="cooldown" class="muted small" style="margin-top:8px;"></div>
+
+        <p class="muted small" style="margin-top:10px; line-height:1.35;">
+          Klikni na „Točit kolo“. Výsledek se uloží do databáze a sleva se použije automaticky v checkoutu.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // data z Flasku
+  const canSpin = {{ 'true' if can_spin else 'false' }};
+  const nextSpinTime = {{ ('"' ~ next_spin_time ~ '"') if next_spin_time else 'null' }};
+  const hasActiveDiscount = {{ 'true' if active_discount is not none else 'false' }};
+
+  // VÝSEČE: aby to odpovídalo backendu (0–20), dáme 21 výsečí: 0,1,2,...,20
+  const slices = Array.from({length: 21}, (_, i) => i);
+
+  const canvas = document.getElementById("wheelCanvas");
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  const cx = W / 2, cy = H / 2;
+  const radius = Math.min(W, H) / 2 - 6;
+  const sliceAngle = (Math.PI * 2) / slices.length;
+
+  let rotation = 0;
+  let spinning = false;
+
+  function drawWheel() {
+    ctx.clearRect(0, 0, W, H);
+
+    // jemný okraj
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius + 2, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(0,0,0,0.06)";
+    ctx.fill();
+
+    for (let i = 0; i < slices.length; i++) {
+      const start = rotation + i * sliceAngle;
+      const end = start + sliceAngle;
+
+      // střídání odstínů
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, radius, start, end);
+      ctx.closePath();
+      ctx.fillStyle = (i % 2 === 0) ? "rgba(0,0,0,0.08)" : "rgba(0,0,0,0.14)";
+      ctx.fill();
+
+      // text
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(start + sliceAngle / 2);
+      ctx.textAlign = "right";
+      ctx.fillStyle = "rgba(0,0,0,0.85)";
+      ctx.font = "bold 14px system-ui, -apple-system, Segoe UI, Roboto, Arial";
+      ctx.fillText(`${slices[i]}%`, radius - 14, 5);
+      ctx.restore();
+    }
+
+    // vnitřní tečka
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius * 0.12, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(0,0,0,0.10)";
+    ctx.fill();
+  }
+
+  function updateCooldown() {
+    const cd = document.getElementById("cooldown");
+
+    if (hasActiveDiscount) {
+      cd.textContent = "Máš aktivní slevu – použij ji v checkoutu.";
+      return;
+    }
+
+    if (!nextSpinTime) {
+      cd.textContent = canSpin ? "Můžeš točit!" : "";
+      return;
+    }
+
+    const t = new Date(nextSpinTime + "Z").getTime(); // UTC
+    const now = Date.now();
+    let diff = Math.floor((t - now) / 1000);
+
+    if (diff <= 0) {
+      cd.textContent = "Můžeš točit!";
+      return;
+    }
+
+    const h = Math.floor(diff / 3600); diff %= 3600;
+    const m = Math.floor(diff / 60);
+    const s = diff % 60;
+
+    cd.textContent = `Další točení za: ${h}h ${m}m ${s}s`;
+  }
+
+  drawWheel();
+  setInterval(updateCooldown, 1000);
+  updateCooldown();
+
+  const btn = document.getElementById("spinBtn");
+  const res = document.getElementById("wheelResult");
+
+  function rotationForPercent(targetPercent) {
+    // šipka je nahoře => -90° (tj. -PI/2)
+    const pointerAngle = -Math.PI / 2;
+
+    // index výseče odpovídá percentu (0..20)
+    const idx = targetPercent;
+
+    // chceme, aby střed výseče mířil na šipku
+    const mid = idx * sliceAngle + sliceAngle / 2;
+    return pointerAngle - mid;
+  }
+
+  async function spin() {
+    if (!canSpin || hasActiveDiscount || spinning) return;
+    spinning = true;
+    btn.disabled = true;
+    res.textContent = "Točím…";
+
+    // call backend
+    const r = await fetch("{{ url_for('wheel_spin') }}", { method: "POST" });
+    const data = await r.json();
+
+    if (!data.ok) {
+      if (data.error === "wait") res.textContent = "Ještě musíš počkat (24h limit).";
+      else if (data.error === "active_discount") res.textContent = `Už máš aktivní slevu ${data.percent} %.`;
+      else res.textContent = "Chyba při točení.";
+      spinning = false;
+      return;
+    }
+
+    const percent = data.percent;
+
+    // animace na přesný výsledek
+    const baseTarget = rotationForPercent(percent);
+    const extraTurns = (Math.PI * 2) * (5 + Math.floor(Math.random() * 3)); // 5–7 otoček
+    const startRot = rotation;
+    const endRot = baseTarget + extraTurns;
+
+    const duration = 2700 + Math.floor(Math.random() * 600);
+    const startTime = performance.now();
+
+    function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+
+    function animate(now) {
+      const t = Math.min(1, (now - startTime) / duration);
+      const e = easeOutCubic(t);
+      rotation = startRot + (endRot - startRot) * e;
+      drawWheel();
+
+      if (t < 1) requestAnimationFrame(animate);
+      else {
+        spinning = false;
+        res.textContent = `Vytočil jsi slevu: ${percent}% ✅`;
+        setTimeout(() => location.reload(), 700);
+      }
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  if (btn) btn.addEventListener("click", spin);
+</script>
+
 {% endblock %}

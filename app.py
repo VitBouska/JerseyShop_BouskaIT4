@@ -1,14 +1,15 @@
 from flask import (
     Flask, render_template, request, redirect, url_for,
-    session, flash, abort
+    session, flash, abort, jsonify
 )
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
-from datetime import datetime
+from datetime import datetime, timedelta
 import re
 import os
 import uuid
+import random
 
 app = Flask(__name__)
 
@@ -55,7 +56,7 @@ class Order(db.Model):
     payment = db.Column(db.String(20), nullable=False)   # card/bank/cod
     note = db.Column(db.String(255))
 
-    total = db.Column(db.Integer, nullable=False)
+    total = db.Column(db.Integer, nullable=False)  # už po slevě (pokud byla)
     status = db.Column(db.String(20), default="pending", nullable=False)  # pending/paid/canceled
 
 
@@ -74,6 +75,20 @@ class OrderItem(db.Model):
     name = db.Column(db.String(120), nullable=False)
     price = db.Column(db.Integer, nullable=False)
     qty = db.Column(db.Integer, nullable=False)
+
+
+# Kolo štěstí: uložené slevy
+class WheelReward(db.Model):
+    __tablename__ = "wheel_rewards123"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users123.id"), nullable=False)
+    user = db.relationship("User", backref=db.backref("wheel_rewards", lazy=True))
+
+    percent = db.Column(db.Integer, nullable=False)  # 0–20
+    issued_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    used_at = db.Column(db.DateTime, nullable=True)  # použito při úspěšné platbě
 
 
 # -------------------------
@@ -117,6 +132,32 @@ def inject_cart():
 
 
 # -------------------------
+# WHEEL HELPERS
+# -------------------------
+def get_active_reward(user_id: int):
+    return (WheelReward.query
+            .filter_by(user_id=user_id, used_at=None)
+            .order_by(WheelReward.issued_at.desc())
+            .first())
+
+
+def last_spin_time(user_id: int):
+    last = (WheelReward.query
+            .filter_by(user_id=user_id)
+            .order_by(WheelReward.issued_at.desc())
+            .first())
+    return last.issued_at if last else None
+
+
+def can_spin(user_id: int):
+    last = last_spin_time(user_id)
+    if not last:
+        return True, None
+    next_time = last + timedelta(hours=24)
+    return datetime.utcnow() >= next_time, next_time
+
+
+# -------------------------
 # ROUTES
 # -------------------------
 @app.route("/")
@@ -157,9 +198,8 @@ def register():
         password = request.form.get("password", "")
         password2 = request.form.get("password2", "")
 
-        # Kontroly
         if not re.fullmatch(r"[A-Za-z0-9_.-]{3,50}", username):
-            error = "Uživatelské jméno musí mít 3–50 znaků a musí obsahovat jen písmena, čísla a . _ -"
+            error = "Uživatelské jméno musí mít 3–50 znaků a může obsahovat jen písmena, čísla a . _ -"
         elif not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email):
             error = "Zadej platný email."
         elif User.query.filter_by(username=username).first():
@@ -203,16 +243,49 @@ def logout():
 
 
 # -------------------------
-# PROFIL
+# PROFIL + KOLO ŠTĚSTÍ
 # -------------------------
 @app.route("/profile")
 @login_required
 def profile():
-    user = {
-        "id": session.get("user_id"),
-        "username": session.get("username"),
-    }
-    return render_template("profile.html", user=user)
+    uid = session["user_id"]
+    active = get_active_reward(uid)
+
+    ok, next_time = can_spin(uid)
+    # pokud má aktivní slevu, nedovolíme další točení (aby neměl 10 aktivních slev)
+    can_spin_now = ok and (active is None)
+
+    user = {"id": uid, "username": session.get("username")}
+    return render_template(
+        "profile.html",
+        user=user,
+        active_discount=(active.percent if active else None),
+        can_spin=can_spin_now,
+        next_spin_time=(next_time.isoformat() if next_time else None)
+    )
+
+
+@app.route("/wheel/spin", methods=["POST"])
+@login_required
+def wheel_spin():
+    uid = session["user_id"]
+
+    ok, next_time = can_spin(uid)
+    if not ok:
+        remaining = int((next_time - datetime.utcnow()).total_seconds())
+        return jsonify({"ok": False, "error": "wait", "remaining": max(0, remaining)}), 429
+
+    active = get_active_reward(uid)
+    if active:
+        return jsonify({"ok": False, "error": "active_discount", "percent": active.percent}), 400
+
+    percent = random.randint(0, 20)
+
+    r = WheelReward(user_id=uid, percent=percent)
+    db.session.add(r)
+    db.session.commit()
+
+    return jsonify({"ok": True, "percent": percent})
 
 
 # -------------------------
@@ -295,21 +368,23 @@ def cart_clear():
 
 
 # -------------------------
-# CHECKOUT (DB objednávka)
+# CHECKOUT (DB objednávka + automatická sleva)
 # -------------------------
 @app.route("/checkout", methods=["GET", "POST"])
 @login_required
 def checkout():
     cart = _get_cart()
     items = list(cart["items"].values())
-    total = _cart_total()
+    base_total = _cart_total()
 
     if not items:
         flash("Košík je prázdný.", "error")
         return redirect(url_for("cart"))
 
     if request.method == "GET":
-        return render_template("checkout.html", items=items, total=total)
+        # tady můžeš případně do šablony poslat info o aktivní slevě
+        active = get_active_reward(session["user_id"])
+        return render_template("checkout.html", items=items, total=base_total, active_discount=(active.percent if active else None))
 
     # POST – načteme data z formuláře
     full_name = request.form.get("full_name", "").strip()
@@ -324,10 +399,18 @@ def checkout():
     payment = request.form.get("payment", "").strip()
     note = request.form.get("note", "").strip()
 
-    # jednoduchá validace
     if not full_name or not email or not street or not city or not zip_code or not shipping or not payment:
         flash("Vyplň prosím všechny povinné údaje.", "error")
-        return render_template("checkout.html", items=items, total=total)
+        return render_template("checkout.html", items=items, total=base_total)
+
+    # --- Sleva z kola (pokud existuje) ---
+    active = get_active_reward(session["user_id"])
+    discount_percent = active.percent if active else 0
+    discount_amount = int(round(base_total * (discount_percent / 100)))
+    final_total = max(0, base_total - discount_amount)
+
+    if discount_percent > 0:
+        flash(f"Používá se sleva z kola: {discount_percent}% (-{discount_amount} Kč)", "success")
 
     # vytvoření objednávky v DB (pending)
     order_code = "ORD-" + uuid.uuid4().hex[:8].upper()
@@ -342,11 +425,11 @@ def checkout():
         shipping=shipping,
         payment=payment,
         note=note or None,
-        total=total,
+        total=final_total,
         status="pending",
     )
     db.session.add(o)
-    db.session.flush()  # získáme o.id ještě před commitem
+    db.session.flush()  # získáme o.id
 
     for it in items:
         db.session.add(OrderItem(
@@ -404,6 +487,12 @@ def payment_confirm():
     if action == "pay":
         order.status = "paid"
         db.session.commit()
+
+        # „spálit“ aktivní slevu z kola (označit used_at)
+        active = get_active_reward(session["user_id"])
+        if active:
+            active.used_at = datetime.utcnow()
+            db.session.commit()
 
         session.pop("cart", None)
         session.pop("pending_order_id", None)
