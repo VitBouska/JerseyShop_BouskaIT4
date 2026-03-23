@@ -54,32 +54,36 @@
     <h3 class="section-title">Platební údaje</h3>
   <p class="muted">Simulace platby kartou (údaje se nikam neodesílají)</p>
 
+  <div id="payment-content">
+
   <form method="POST" action="{{ url_for('payment_confirm') }}" id="payment-form">
 
     <label>Číslo karty</label>
-    <input type="text" name="card_number" placeholder="1234 5678 9012 3456" maxlength="19" required>
+    <input type="text" name="card_number" placeholder="1234 5678 9012 3456">
 
-    <div class="form-row">
-      <div>
-        <label>Platnost</label>
-        <input type="text" name="expiry" placeholder="MM/YY" maxlength="5" required>
-      </div>
+    <label>Platnost</label>
+    <input type="text" name="expiry" placeholder="MM/YY">
 
-      <div>
-        <label>CVC</label>
-        <input type="text" name="cvc" placeholder="123" maxlength="3" required>
-      </div>
-    </div>
+    <label>CVC</label>
+    <input type="text" name="cvc" placeholder="123">
 
-    <label>Jméno na kartě</label>
-    <input type="text" name="card_name" placeholder="Jan Novák" required>
+    <label>Jméno</label>
+    <input type="text" name="card_name">
 
-    <div class="pay-actions">
-      <button class="btn" type="submit" name="action" value="pay">Zaplatit</button>
-      <button class="btn ghost" type="submit" name="action" value="cancel">Zrušit</button>
-    </div>
+    <button type="submit">Zaplatit</button>
 
   </form>
+
+</div>
+
+<!-- ❗ ERROR zpráva -->
+<div id="error-box" class="error-box"></div>
+
+<!-- ❗ LOADING animace -->
+<div id="loading" class="loading">
+  <div class="spinner"></div>
+  <p>Zpracování platby...</p>
+</div>
 
   <hr>
   <a class="btn ghost" href="{{ url_for('checkout') }}">Zpět</a>
