@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Panel – E-shop Dresy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0f13;
+      --surface: #161921;
+      --surface2: #1e2330;
+      --border: #2a3045;
+      --accent: #f0c040;
+      --accent2: #4ef0a0;
+      --danger: #f05060;
+      --text: #e8ecf4;
+      --muted: #7a8299;
+      --radius: 10px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* SIDEBAR */
+    .layout { display: flex; min-height: 100vh; }
+
+    .sidebar {
+      width: 220px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 28px 0;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      padding: 0 24px 28px;
+      font-size: 13px;
+      font-family: 'Space Mono', monospace;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .sidebar-logo strong { display: block; color: var(--accent); font-size: 16px; margin-bottom: 2px; }
+
+    .sidebar nav a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 24px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all .15s;
+      border-left: 3px solid transparent;
+    }
+    .sidebar nav a:hover, .sidebar nav a.active {
+      color: var(--text);
+      background: var(--surface2);
+      border-left-color: var(--accent);
+    }
+    .sidebar nav a .icon { font-size: 16px; width: 20px; text-align: center; }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 16px 24px;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      font-family: 'Space Mono', monospace;
+    }
+    .sidebar-footer a { color: var(--danger); text-decoration: none; font-weight: 700; }
+
+    /* MAIN */
+    .main {
+      margin-left: 220px;
+      padding: 32px 36px;
+      flex: 1;
+    }
+
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 32px;
+    }
+    .topbar h1 { font-size: 26px; font-weight: 800; letter-spacing: -.5px; }
+    .topbar h1 span { color: var(--accent); }
+
+    .badge-admin {
+      background: var(--accent);
+      color: #000;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Space Mono', monospace;
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+    }
+
+    /* ALERTS */
+    .alert {
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .alert.success { background: rgba(78,240,160,.15); border: 1px solid var(--accent2); color: var(--accent2); }
+    .alert.error { background: rgba(240,80,96,.15); border: 1px solid var(--danger); color: var(--danger); }
+
+    /* STATS ROW */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+    }
+    .stat-card .label { font-size: 11px; font-family: 'Space Mono', monospace; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .stat-card .value { font-size: 28px; font-weight: 800; color: var(--accent); }
+    .stat-card .sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    /* TABLE */
+    .section { margin-bottom: 40px; }
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .section-header h2 { font-size: 18px; font-weight: 800; }
+    .section-header h2 .dot { color: var(--accent); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    thead tr { background: var(--surface2); }
+    th {
+      padding: 12px 16px;
+      font-size: 11px;
+      font-family: 'Space Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 12px 16px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,.02); }
+
+    .price { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--accent2); }
+    .old-price { font-family: 'Space Mono', monospace; color: var(--muted); text-decoration: line-through; font-size: 12px; }
+    .badge-sleva {
+      background: var(--danger);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-family: 'Space Mono', monospace;
+    }
+    .badge-none {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Syne', sans-serif;
+      cursor: pointer;
+      border: none;
+      transition: all .15s;
+      text-decoration: none;
+    }
+    .btn-primary { background: var(--accent); color: #000; }
+    .btn-primary:hover { background: #ffd060; }
+    .btn-danger { background: rgba(240,80,96,.15); color: var(--danger); border: 1px solid var(--danger); }
+    .btn-danger:hover { background: var(--danger); color: #fff; }
+    .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-sm { padding: 5px 11px; font-size: 12px; }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.7);
+      z-index: 999;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px;
+      width: 480px;
+      max-width: 95vw;
+      position: relative;
+    }
+    .modal h3 { font-size: 20px; font-weight: 800; margin-bottom: 20px; }
+    .modal h3 span { color: var(--accent); }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      background: none; border: none; color: var(--muted);
+      font-size: 20px; cursor: pointer; line-height: 1;
+    }
+    .modal-close:hover { color: var(--text); }
+
+    /* FORM ELEMENTS */
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-family: 'Space Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: 'Syne', sans-serif;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+
+    /* ADD PRODUCT SECTION */
+    .add-card {
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      margin-bottom: 40px;
+    }
+    .add-card h2 { font-size: 18px; font-weight: 800; margin-bottom: 20px; }
+    .add-card h2 span { color: var(--accent2); }
+    .add-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .add-grid .full { grid-column: 1 / -1; }
+
+    /* ORDERS TABLE */
+    .status-badge {
+      font-size: 11px;
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .status-pending { background: rgba(240,192,64,.15); color: var(--accent); }
+    .status-paid { background: rgba(78,240,160,.15); color: var(--accent2); }
+
+    /* TABS */
+    .tabs { display: flex; gap: 4px; margin-bottom: 28px; border-bottom: 1px solid var(--border); }
+    .tab-btn {
+      background: none; border: none;
+      color: var(--muted);
+      font-size: 14px; font-weight: 700; font-family: 'Syne', sans-serif;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all .15s;
+    }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-btn:hover { color: var(--text); }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* PRODUCT NAME */
+    .prod-name { font-weight: 700; }
+    .prod-team { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <strong>⚽ Admin Panel</strong>
+      E-shop Dresy
+    </div>
+    <nav>
+      <a href="#" class="active" onclick="showTab('produkty', this)">
+        <span class="icon">📦</span> Produkty
+      </a>
+      <a href="#" onclick="showTab('objednavky', this)">
+        <span class="icon">📋</span> Objednávky
+      </a>
+      <a href="{{ url_for('index') }}">
+        <span class="icon">🌐</span> Zpět na e-shop
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      Přihlášen jako <strong>{{ session.get('username', 'admin') }}</strong><br>
+      <a href="{{ url_for('logout') }}">← Odhlásit se</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <h1>Admin <span>Dashboard</span></h1>
+      <span class="badge-admin">ADMIN MODE</span>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- STATS -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="label">Produkty</div>
+        <div class="value">{{ products|length }}</div>
+        <div class="sub">celkem v katalogu</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Se slevou</div>
+        <div class="value">{{ products|selectattr('badge')|list|length }}</div>
+        <div class="sub">aktuálně zlevněných</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Objednávky</div>
+        <div class="value">{{ orders|length }}</div>
+        <div class="sub">celkem</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Zaplaceno</div>
+        <div class="value">{{ orders|selectattr('status', 'eq', 'paid')|list|length }}</div>
+        <div class="sub">dokončených objednávek</div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('produkty', this)">📦 Správa produktů</button>
+      <button class="tab-btn" onclick="showTab('objednavky', this)">📋 Objednávky</button>
+    </div>
+
+    <!-- TAB: PRODUKTY -->
+    <div class="tab-content active" id="tab-produkty">
+
+      <!-- PŘIDAT PRODUKT -->
+      <div class="add-card">
+        <h2>➕ Přidat <span>nový produkt</span></h2>
+        <form method="POST" action="{{ url_for('admin_add_product') }}">
+          <div class="add-grid">
+            <div class="form-group">
+              <label>Název produktu</label>
+              <input type="text" name="name" placeholder="např. Chelsea – domácí" required>
+            </div>
+            <div class="form-group">
+              <label>Soubor obrázku</label>
+              <input type="text" name="image_file" placeholder="chelsea_home.png">
+            </div>
+            <div class="form-group">
+              <label>Team key (pro filtr)</label>
+              <input type="text" name="team_key" placeholder="chelsea">
+            </div>
+            <div class="form-group">
+              <label>Typ (home / away)</label>
+              <select name="type_key">
+                <option value="home">home – domácí</option>
+                <option value="away">away – venkovní</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Cena (Kč)</label>
+              <input type="number" name="price" placeholder="1799" required>
+            </div>
+            <div class="form-group">
+              <label>Původní cena – sleva (Kč, nepovinné)</label>
+              <input type="number" name="old_price" placeholder="2099 nebo prázdné">
+            </div>
+            <div class="form-group">
+              <label>Sezóna</label>
+              <input type="text" name="season" value="25/26">
+            </div>
+            <div class="form-group">
+              <label>Badge (text slevy, nepovinné)</label>
+              <input type="text" name="badge" placeholder="Sleva / Novinka">
+            </div>
+            <div class="form-group full">
+              <label>Dostupné velikosti (oddělené čárkou)</label>
+              <input type="text" name="sizes" placeholder="S, M, L, XL" value="S, M, L, XL">
+            </div>
+            <div class="form-group full">
+              <label>Dostupná čísla (oddělená čárkou)</label>
+              <input type="text" name="numbers" placeholder="Bez čísla, 9, 10" value="Bez čísla, 9, 10">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top: 8px;">➕ Přidat produkt</button>
+        </form>
+      </div>
+
+      <!-- TABULKA PRODUKTŮ -->
+      <div class="section">
+        <div class="section-header">
+          <h2>Katalog produktů <span class="dot">·</span> {{ products|length }} položek</h2>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Název</th>
+              <th>Cena</th>
+              <th>Původní cena</th>
+              <th>Badge / Sleva</th>
+              <th>Sezóna</th>
+              <th>Akce</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in products %}
+            <tr>
+              <td><span style="font-family: 'Space Mono', monospace; color: var(--muted);">#{{ p.id }}</span></td>
+              <td>
+                <div class="prod-name">{{ p.name }}</div>
+                <div class="prod-team">{{ p.team_key }} · {{ p.type_key }}</div>
+              </td>
+              <td><span class="price">{{ p.price }} Kč</span></td>
+              <td>
+                {% if p.old_price %}
+                  <span class="old-price">{{ p.old_price }} Kč</span>
+                {% else %}
+                  <span class="badge-none">—</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if p.badge %}
+                  <span class="badge-sleva">{{ p.badge }}</span>
+                {% else %}
+                  <span class="badge-none">—</span>
+                {% endif %}
+              </td>
+              <td><span style="font-family:'Space Mono',monospace; font-size:12px;">{{ p.season }}</span></td>
+              <td>
+                <div style="display:flex; gap:6px;">
+                  <button class="btn btn-ghost btn-sm" onclick="openEdit('{{ p.id }}', '{{ p.name|e }}', {{ p.price }}, {{ p.old_price if p.old_price else 'null' }}, '{{ p.badge if p.badge else '' }}')">✏️ Upravit</button>
+                  <form method="POST" action="{{ url_for('admin_delete_product', product_id=p.id) }}" onsubmit="return confirm('Opravdu smazat produkt {{ p.name|e }}?');" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /tab-produkty -->
+
+    <!-- TAB: OBJEDNÁVKY -->
+    <div class="tab-content" id="tab-objednavky">
+      <div class="section">
+        <div class="section-header">
+          <h2>Přehled objednávek <span class="dot">·</span> {{ orders|length }} celkem</h2>
+        </div>
+        {% if orders %}
+        <table>
+          <thead>
+            <tr>
+              <th>Kód</th>
+              <th>Zákazník</th>
+              <th>Datum</th>
+              <th>Celkem</th>
+              <th>Platba</th>
+              <th>Status</th>
+              <th>Akce</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for o in orders %}
+            <tr>
+              <td><span style="font-family:'Space Mono',monospace; font-size:12px; color:var(--accent);">{{ o.order_code }}</span></td>
+              <td>
+                <div style="font-weight:600;">{{ o.full_name }}</div>
+                <div style="font-size:12px; color:var(--muted);">{{ o.email }}</div>
+              </td>
+              <td><span style="font-size:12px; color:var(--muted); font-family:'Space Mono',monospace;">{{ o.created_at.strftime('%d.%m.%Y %H:%M') }}</span></td>
+              <td><span class="price">{{ o.total }} Kč</span></td>
+              <td><span style="font-size:12px; color:var(--muted);">{{ o.payment }}</span></td>
+              <td>
+                <span class="status-badge status-{{ o.status }}">{{ o.status }}</span>
+              </td>
+              <td>
+                <form method="POST" action="{{ url_for('admin_update_order_status', order_id=o.id) }}" style="display:flex; gap:6px; align-items:center;">
+                  <select name="status" style="background:var(--bg); border:1px solid var(--border); border-radius:5px; color:var(--text); padding:4px 8px; font-size:12px; font-family:'Syne',sans-serif;">
+                    <option value="pending" {% if o.status == 'pending' %}selected{% endif %}>pending</option>
+                    <option value="paid" {% if o.status == 'paid' %}selected{% endif %}>paid</option>
+                    <option value="shipped" {% if o.status == 'shipped' %}selected{% endif %}>shipped</option>
+                    <option value="cancelled" {% if o.status == 'cancelled' %}selected{% endif %}>cancelled</option>
+                  </select>
+                  <button type="submit" class="btn btn-primary btn-sm">Uložit</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div style="text-align:center; padding:40px; color:var(--muted);">Žádné objednávky zatím.</div>
+        {% endif %}
+      </div>
+    </div><!-- /tab-objednavky -->
+
+  </main>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeEdit()">✕</button>
+    <h3>Upravit <span>produkt</span></h3>
+    <form method="POST" action="{{ url_for('admin_edit_product') }}">
+      <input type="hidden" name="product_id" id="edit_id">
+      <div class="form-row">
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Název</label>
+          <input type="text" name="name" id="edit_name" required>
+        </div>
+        <div class="form-group">
+          <label>Cena (Kč)</label>
+          <input type="number" name="price" id="edit_price" required>
+        </div>
+        <div class="form-group">
+          <label>Původní cena – sleva (Kč)</label>
+          <input type="number" name="old_price" id="edit_old_price" placeholder="prázdné = bez slevy">
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label>Badge (text slevy – prázdné = bez badge)</label>
+          <input type="text" name="badge" id="edit_badge" placeholder="Sleva / Novinka / prázdné">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeEdit()">Zrušit</button>
+        <button type="submit" class="btn btn-primary">💾 Uložit změny</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function showTab(name, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    if (btn) btn.classList.add('active');
+  }
+
+  function openEdit(id, name, price, oldPrice, badge) {
+    document.getElementById('edit_id').value = id;
+    document.getElementById('edit_name').value = name;
+    document.getElementById('edit_price').value = price;
+    document.getElementById('edit_old_price').value = oldPrice || '';
+    document.getElementById('edit_badge').value = badge || '';
+    document.getElementById('editModal').classList.add('open');
+  }
+
+  function closeEdit() {
+    document.getElementById('editModal').classList.remove('open');
+  }
+
+  document.getElementById('editModal').addEventListener('click', function(e) {
+    if (e.target === this) closeEdit();
+  });
+</script>
+</body>
+</html>
