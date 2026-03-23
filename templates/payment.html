@@ -87,3 +87,20 @@
 </div>
 
 {% endblock %}
+
+<script>
+document.getElementById("payment-form").addEventListener("submit", function(e) {
+  const card = document.querySelector("[name='card_number']").value.replace(/\s/g, "");
+  const cvc = document.querySelector("[name='cvc']").value;
+
+  if (card.length < 16) {
+    alert("Neplatné číslo karty");
+    e.preventDefault();
+  }
+
+  if (cvc.length !== 3) {
+    alert("CVC musí mít 3 číslice");
+    e.preventDefault();
+  }
+});
+</script>
