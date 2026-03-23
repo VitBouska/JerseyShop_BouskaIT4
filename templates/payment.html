@@ -89,18 +89,75 @@
 {% endblock %}
 
 <script>
-document.getElementById("payment-form").addEventListener("submit", function(e) {
-  const card = document.querySelector("[name='card_number']").value.replace(/\s/g, "");
-  const cvc = document.querySelector("[name='cvc']").value;
+const form = document.getElementById("payment-form");
+const cardInput = document.querySelector("[name='card_number']");
+const expiryInput = document.querySelector("[name='expiry']");
+const cvcInput = document.querySelector("[name='cvc']");
+
+// 👉 Formátování čísla karty (1234 5678 9012 3456)
+cardInput.addEventListener("input", (e) => {
+  let value = e.target.value.replace(/\D/g, "");
+  value = value.substring(0, 16);
+  value = value.replace(/(.{4})/g, "$1 ").trim();
+  e.target.value = value;
+});
+
+// 👉 Formátování expirace (MM/YY)
+expiryInput.addEventListener("input", (e) => {
+  let value = e.target.value.replace(/\D/g, "");
+  if (value.length > 4) value = value.substring(0, 4);
+  if (value.length >= 3) {
+    value = value.substring(0,2) + "/" + value.substring(2);
+  }
+  e.target.value = value;
+});
+
+// 👉 Jen čísla do CVC
+cvcInput.addEventListener("input", (e) => {
+  e.target.value = e.target.value.replace(/\D/g, "").substring(0,3);
+});
+
+// 👉 Validace + animace
+form.addEventListener("submit", function(e) {
+  const card = cardInput.value.replace(/\s/g, "");
+  const expiry = expiryInput.value;
+  const cvc = cvcInput.value;
+
+  let error = "";
 
   if (card.length < 16) {
-    alert("Neplatné číslo karty");
-    e.preventDefault();
+    error = "Číslo karty musí mít 16 číslic";
+  } else if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+    error = "Neplatná expirace (MM/YY)";
+  } else if (cvc.length !== 3) {
+    error = "CVC musí mít 3 číslice";
   }
 
-  if (cvc.length !== 3) {
-    alert("CVC musí mít 3 číslice");
+  if (error) {
     e.preventDefault();
+    showError(error);
+    return;
   }
+
+  // 👉 Animace „zpracování“
+  e.preventDefault();
+  showLoading();
+
+  setTimeout(() => {
+    form.submit();
+  }, 2000);
 });
+
+// 👉 Error message
+function showError(msg) {
+  let box = document.getElementById("error-box");
+  box.innerText = msg;
+  box.style.display = "block";
+}
+
+// 👉 Loading animace
+function showLoading() {
+  document.getElementById("payment-content").style.display = "none";
+  document.getElementById("loading").style.display = "flex";
+}
 </script>
