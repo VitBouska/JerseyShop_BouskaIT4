@@ -9,15 +9,14 @@
 
 <body>
     <header class="site-header">
-    <div class="header-inner">
-        <div class="logo">
-            <span>E-shop Dresy</span>
-        </div>
-        <div class="tagline">
-        Fotbalové dresy evropských klubů
-        </div>
+  <div class="header-inner">
+    <div class="logo">
+      <a href="{{ url_for('index') }}">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="E-shop Dresy" width="200">
+      </a>
     </div>
-    </header>
+  </div>
+</header>
   <!-- Navigace -->
   <nav>
   <a href="{{ url_for('index') }}">Domů</a>
