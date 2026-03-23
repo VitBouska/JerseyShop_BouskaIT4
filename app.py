@@ -727,9 +727,9 @@ def payment_confirm():
 
     card_number = request.form.get("card_number")
 
-if not card_number or len(card_number.replace(" ", "")) < 16:
-    flash("Neplatná karta")
-    return redirect(url_for("payment"))
+    if not card_number or len(card_number.replace(" ", "")) < 16:
+        flash("Neplatná karta")
+        return redirect(url_for("payment"))
 
     order = Order.query.filter_by(id=order_id, user_id=session["user_id"]).first()
     if not order:
