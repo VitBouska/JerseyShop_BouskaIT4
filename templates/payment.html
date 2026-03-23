@@ -51,17 +51,38 @@
 
   <!-- Akce -->
   <div class="card">
-    <h3 class="section-title">Zvol akci</h3>
-    <p class="muted">Klikni na „Zaplatit“ pro úspěšnou platbu nebo „Zrušit“ pro simulaci neúspěchu.</p>
+    <h3 class="section-title">Platební údaje</h3>
+  <p class="muted">Simulace platby kartou (údaje se nikam neodesílají)</p>
 
-    <form method="POST" action="{{ url_for('payment_confirm') }}" class="pay-actions">
-      <button class="btn" name="action" value="pay" type="submit">Zaplatit</button>
-      <button class="btn ghost" name="action" value="cancel" type="submit">Zrušit platbu</button>
-    </form>
+  <form method="POST" action="{{ url_for('payment_confirm') }}" id="payment-form">
 
-    <hr>
+    <label>Číslo karty</label>
+    <input type="text" name="card_number" placeholder="1234 5678 9012 3456" maxlength="19" required>
 
-    <a class="btn ghost" href="{{ url_for('checkout') }}">Zpět na údaje</a>
+    <div class="form-row">
+      <div>
+        <label>Platnost</label>
+        <input type="text" name="expiry" placeholder="MM/YY" maxlength="5" required>
+      </div>
+
+      <div>
+        <label>CVC</label>
+        <input type="text" name="cvc" placeholder="123" maxlength="3" required>
+      </div>
+    </div>
+
+    <label>Jméno na kartě</label>
+    <input type="text" name="card_name" placeholder="Jan Novák" required>
+
+    <div class="pay-actions">
+      <button class="btn" type="submit" name="action" value="pay">Zaplatit</button>
+      <button class="btn ghost" type="submit" name="action" value="cancel">Zrušit</button>
+    </div>
+
+  </form>
+
+  <hr>
+  <a class="btn ghost" href="{{ url_for('checkout') }}">Zpět</a>
   </div>
 </div>
 
