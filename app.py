@@ -32,7 +32,7 @@ db = SQLAlchemy(app)
 PRODUCTS = {
     "1": {
         "id": "1",
-        "name": "Manchester City – domácí",
+        "name": "Manchester City - domaci",
         "team_key": "mancity",
         "type_key": "home",
         "season": "25/26",
@@ -41,11 +41,11 @@ PRODUCTS = {
         "badge": "Sleva",
         "image_file": "mancity_home.png",
         "stock_sizes": ["S", "M", "L", "XL"],
-        "stock_numbers": ["Bez čísla", "9", "10", "11", "HAALAND 9", "DE BRUYNE 17"],
+        "stock_numbers": ["Bez cisla", "9", "10", "11", "HAALAND 9", "DE BRUYNE 17"],
     },
     "2": {
         "id": "2",
-        "name": "Manchester City – venkovní",
+        "name": "Manchester City - venkovni",
         "team_key": "mancity",
         "type_key": "away",
         "season": "25/26",
@@ -54,11 +54,11 @@ PRODUCTS = {
         "badge": None,
         "image_file": "mancity_away.png",
         "stock_sizes": ["S", "M", "L"],
-        "stock_numbers": ["Bez čísla", "9", "10", "FODEN 47"],
+        "stock_numbers": ["Bez cisla", "9", "10", "FODEN 47"],
     },
     "3": {
         "id": "3",
-        "name": "Real Madrid – domácí",
+        "name": "Real Madrid - domaci",
         "team_key": "realmadrid",
         "type_key": "home",
         "season": "25/26",
@@ -67,11 +67,11 @@ PRODUCTS = {
         "badge": "Sleva",
         "image_file": "realmadrid_home.png",
         "stock_sizes": ["M", "L", "XL"],
-        "stock_numbers": ["Bez čísla", "5", "7", "10", "BELLINGHAM 5", "VINICIUS 7"],
+        "stock_numbers": ["Bez cisla", "5", "7", "10", "BELLINGHAM 5", "VINICIUS 7"],
     },
     "4": {
         "id": "4",
-        "name": "Real Madrid – venkovní",
+        "name": "Real Madrid - venkovni",
         "team_key": "realmadrid",
         "type_key": "away",
         "season": "25/26",
@@ -80,11 +80,11 @@ PRODUCTS = {
         "badge": None,
         "image_file": "realmadrid_away.png",
         "stock_sizes": ["S", "M", "L", "XL"],
-        "stock_numbers": ["Bez čísla", "5", "7", "10", "VALVERDE 15"],
+        "stock_numbers": ["Bez cisla", "5", "7", "10", "VALVERDE 15"],
     },
     "5": {
         "id": "5",
-        "name": "Barcelona – domácí",
+        "name": "Barcelona - domaci",
         "team_key": "barcelona",
         "type_key": "home",
         "season": "25/26",
@@ -93,11 +93,11 @@ PRODUCTS = {
         "badge": "Sleva",
         "image_file": "barcelona_home.png",
         "stock_sizes": ["S", "M", "L"],
-        "stock_numbers": ["Bez čísla", "9", "10", "RAPINHA 19", "LEWANDOWSKI 9"],
+        "stock_numbers": ["Bez cisla", "9", "10", "RAPINHA 19", "LEWANDOWSKI 9"],
     },
     "6": {
         "id": "6",
-        "name": "Barcelona – venkovní",
+        "name": "Barcelona - venkovni",
         "team_key": "barcelona",
         "type_key": "away",
         "season": "25/26",
@@ -106,11 +106,11 @@ PRODUCTS = {
         "badge": None,
         "image_file": "barcelona_away.png",
         "stock_sizes": ["M", "L", "XL"],
-        "stock_numbers": ["Bez čísla", "10", "11", "BALDE 19"],
+        "stock_numbers": ["Bez cisla", "10", "11", "BALDE 19"],
     },
     "7": {
         "id": "7",
-        "name": "Bayern Mnichov – domácí",
+        "name": "Bayern Mnichov - domaci",
         "team_key": "bayern",
         "type_key": "home",
         "season": "25/26",
@@ -119,11 +119,11 @@ PRODUCTS = {
         "badge": "Sleva",
         "image_file": "bayern_home.png",
         "stock_sizes": ["S", "M", "L", "XL"],
-        "stock_numbers": ["Bez čísla", "9", "10", "KIMMICH 6", "KANE 9"],
+        "stock_numbers": ["Bez cisla", "9", "10", "KIMMICH 6", "KANE 9"],
     },
     "8": {
         "id": "8",
-        "name": "Bayern Mnichov – venkovní",
+        "name": "Bayern Mnichov - venkovni",
         "team_key": "bayern",
         "type_key": "away",
         "season": "25/26",
@@ -132,11 +132,11 @@ PRODUCTS = {
         "badge": None,
         "image_file": "bayern_away.png",
         "stock_sizes": ["S", "M", "L"],
-        "stock_numbers": ["Bez čísla", "9", "10", "MUSIALA 42"],
+        "stock_numbers": ["Bez cisla", "9", "10", "MUSIALA 42"],
     },
     "9": {
         "id": "9",
-        "name": "PSG – domácí",
+        "name": "PSG - domaci",
         "team_key": "psg",
         "type_key": "home",
         "season": "25/26",
@@ -145,11 +145,11 @@ PRODUCTS = {
         "badge": "Sleva",
         "image_file": "psg_home.png",
         "stock_sizes": ["M", "L", "XL"],
-        "stock_numbers": ["Bez čísla", "7", "10", "MBAPPÉ 7"],
+        "stock_numbers": ["Bez cisla", "7", "10", "MBAPPE 7"],
     },
     "10": {
         "id": "10",
-        "name": "PSG – venkovní",
+        "name": "PSG - venkovni",
         "team_key": "psg",
         "type_key": "away",
         "season": "25/26",
@@ -158,11 +158,11 @@ PRODUCTS = {
         "badge": None,
         "image_file": "psg_away.png",
         "stock_sizes": ["S", "M", "L"],
-        "stock_numbers": ["Bez čísla", "7", "10", "DEMBÉLÉ 10"],
+        "stock_numbers": ["Bez cisla", "7", "10", "DEMBELE 10"],
     },
     "11": {
         "id": "11",
-        "name": "Arsenal – domácí",
+        "name": "Arsenal - domaci",
         "team_key": "arsenal",
         "type_key": "home",
         "season": "25/26",
@@ -171,11 +171,11 @@ PRODUCTS = {
         "badge": "Sleva",
         "image_file": "arsenal_home.png",
         "stock_sizes": ["S", "M", "L", "XL"],
-        "stock_numbers": ["Bez čísla", "7", "8", "SAKA 7", "ØDEGAARD 8"],
+        "stock_numbers": ["Bez cisla", "7", "8", "SAKA 7", "ODEGAARD 8"],
     },
     "12": {
         "id": "12",
-        "name": "Arsenal – venkovní",
+        "name": "Arsenal - venkovni",
         "team_key": "arsenal",
         "type_key": "away",
         "season": "25/26",
@@ -184,11 +184,11 @@ PRODUCTS = {
         "badge": None,
         "image_file": "arsenal_away.png",
         "stock_sizes": ["M", "L"],
-        "stock_numbers": ["Bez čísla", "7", "9", "JESUS 9"],
+        "stock_numbers": ["Bez cisla", "7", "9", "JESUS 9"],
     },
     "13": {
         "id": "13",
-        "name": "Juventus – domácí",
+        "name": "Juventus - domaci",
         "team_key": "juventus",
         "type_key": "home",
         "season": "25/26",
@@ -197,11 +197,11 @@ PRODUCTS = {
         "badge": None,
         "image_file": "juventus_home.png",
         "stock_sizes": ["S", "M", "L"],
-        "stock_numbers": ["Bez čísla", "7", "10", "CHIESA 7"],
+        "stock_numbers": ["Bez cisla", "7", "10", "CHIESA 7"],
     },
     "14": {
         "id": "14",
-        "name": "Juventus – venkovní",
+        "name": "Juventus - venkovni",
         "team_key": "juventus",
         "type_key": "away",
         "season": "25/26",
@@ -210,7 +210,7 @@ PRODUCTS = {
         "badge": "Sleva",
         "image_file": "juventus_away.png",
         "stock_sizes": ["M", "L", "XL"],
-        "stock_numbers": ["Bez čísla", "7", "9", "VLAHOVIĆ 9"],
+        "stock_numbers": ["Bez cisla", "7", "9", "VLAHOVIC 9"],
     },
 }
 
@@ -218,6 +218,56 @@ PRODUCTS = {
 # -------------------------
 # MODELY
 # -------------------------
+
+class Product(db.Model):
+    __tablename__ = "products123"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False)
+    team_key = db.Column(db.String(50))
+    type_key = db.Column(db.String(10))
+    season = db.Column(db.String(20))
+    price = db.Column(db.Integer, nullable=False)
+    old_price = db.Column(db.Integer, nullable=True)
+    badge = db.Column(db.String(50), nullable=True)
+    image_file = db.Column(db.String(100), nullable=True)
+    stock_sizes = db.Column(db.String(200))
+    stock_numbers = db.Column(db.String(500))
+
+    def to_dict(self):
+        return {
+            "id": str(self.id),
+            "name": self.name,
+            "team_key": self.team_key or "",
+            "type_key": self.type_key or "home",
+            "season": self.season or "25/26",
+            "price": self.price,
+            "old_price": self.old_price,
+            "badge": self.badge,
+            "image_file": self.image_file,
+            "stock_sizes": [s.strip() for s in (self.stock_sizes or "").split(",") if s.strip()],
+            "stock_numbers": [n.strip() for n in (self.stock_numbers or "").split(",") if n.strip()],
+        }
+
+
+def _seed_products_if_empty():
+    if Product.query.count() == 0:
+        for p in PRODUCTS.values():
+            db.session.add(Product(
+                id=int(p["id"]),
+                name=p["name"],
+                team_key=p.get("team_key"),
+                type_key=p.get("type_key"),
+                season=p.get("season", "25/26"),
+                price=p["price"],
+                old_price=p.get("old_price"),
+                badge=p.get("badge"),
+                image_file=p.get("image_file"),
+                stock_sizes=",".join(p.get("stock_sizes", [])),
+                stock_numbers=",".join(p.get("stock_numbers", [])),
+            ))
+        db.session.commit()
+
+
 class User(db.Model):
     __tablename__ = "users123"
     id = db.Column(db.Integer, primary_key=True)
@@ -284,7 +334,7 @@ def login_required(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
         if not session.get("user_id"):
-            flash("Nejprve se přihlas.", "error")
+            flash("Nejprve se prihlas.", "error")
             return redirect(url_for("login", next=request.path))
         return fn(*args, **kwargs)
     return wrapper
@@ -347,20 +397,21 @@ def can_spin(user_id: int):
 # -------------------------
 @app.route("/")
 def index():
-    # předáme produkty do indexu (kvůli slevám + renderu ve smyčce)
-    products_sorted = sorted(PRODUCTS.values(), key=lambda x: int(x["id"]))
-    # doplníme image_url
-    for p in products_sorted:
+    db_products = Product.query.order_by(Product.id).all()
+    products_sorted = []
+    for prod in db_products:
+        p = prod.to_dict()
         p["image_url"] = url_for("static", filename=f"img/{p['image_file']}") if p.get("image_file") else None
+        products_sorted.append(p)
     return render_template("index.html", products=products_sorted)
 
 
 @app.route("/product/<product_id>")
 def product_detail(product_id):
-    p = PRODUCTS.get(str(product_id))
-    if not p:
+    prod = Product.query.get(int(product_id)) if product_id.isdigit() else None
+    if not prod:
         abort(404)
-    p = dict(p)
+    p = prod.to_dict()
     p["image_url"] = url_for("static", filename=f"img/{p['image_file']}") if p.get("image_file") else None
     return render_template("product.html", p=p)
 
@@ -377,11 +428,11 @@ def login():
             session.clear()
             session["user_id"] = user.id
             session["username"] = user.username
-            flash("Přihlášení proběhlo úspěšně.", "success")
+            flash("Prihlaseni probehlo uspesne.", "success")
             next_url = request.args.get("next")
             return redirect(next_url or url_for("index"))
 
-        error = "Špatné jméno nebo heslo."
+        error = "Spatne jmeno nebo heslo."
     return render_template("login.html", error=error)
 
 
@@ -395,21 +446,21 @@ def register():
         password2 = request.form.get("password2", "")
 
         if not re.fullmatch(r"[A-Za-z0-9_.-]{3,50}", username):
-            error = "Uživatelské jméno musí mít 3–50 znaků a může obsahovat jen písmena, čísla a . _ -"
+            error = "Uzivatelske jmeno musi mit 3-50 znaku a muze obsahovat jen pismena, cisla a . _ -"
         elif not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email):
-            error = "Zadej platný email."
+            error = "Zadej platny email."
         elif User.query.filter_by(username=username).first():
-            error = "Uživatelské jméno je již obsazeno."
+            error = "Uzivatelske jmeno je jiz obsazeno."
         elif User.query.filter_by(email=email).first():
-            error = "Email je již použit."
+            error = "Email je jiz pouzit."
         elif password != password2:
-            error = "Hesla se neshodují."
+            error = "Hesla se neshoduji."
         elif len(password) < 8:
-            error = "Heslo musí mít alespoň 8 znaků."
+            error = "Heslo musi mit alespon 8 znaku."
         elif not re.search(r"[A-Z]", password):
-            error = "Heslo musí obsahovat alespoň 1 velké písmeno."
+            error = "Heslo musi obsahovat alespon 1 velke pismeno."
         elif not re.search(r"\d", password):
-            error = "Heslo musí obsahovat alespoň 1 číslo."
+            error = "Heslo musi obsahovat alespon 1 cislo."
 
         if error is None:
             try:
@@ -421,11 +472,11 @@ def register():
                 session.clear()
                 session["user_id"] = new_user.id
                 session["username"] = new_user.username
-                flash("Účet byl úspěšně vytvořen.", "success")
+                flash("Ucet byl uspesne vytvoren.", "success")
                 return redirect(url_for("index"))
             except Exception:
                 db.session.rollback()
-                error = "Nastala chyba při vytváření účtu."
+                error = "Nastala chyba pri vytvareni uctu."
 
     return render_template("register.html", error=error)
 
@@ -433,7 +484,7 @@ def register():
 @app.route("/logout")
 def logout():
     session.clear()
-    flash("Byl(a) jste odhlášen(a).", "info")
+    flash("Byl(a) jste odhlaseni.", "info")
     return redirect(url_for("index"))
 
 
@@ -520,7 +571,7 @@ def cart_add():
         }
 
     session.modified = True
-    flash("Přidáno do košíku.", "success")
+    flash("Pridano do kosiku.", "success")
     return redirect(url_for("cart"))
 
 
@@ -544,7 +595,7 @@ def cart_update():
         cart["items"][pid]["qty"] = qty
 
     session.modified = True
-    flash("Košík upraven.", "info")
+    flash("Kosik upraven.", "info")
     return redirect(url_for("cart"))
 
 
@@ -554,20 +605,19 @@ def cart_remove():
     cart = _get_cart()
     cart["items"].pop(pid, None)
     session.modified = True
-    flash("Položka odebrána.", "info")
+    flash("Polozka odebrana.", "info")
     return redirect(url_for("cart"))
 
 
 @app.route("/cart/clear")
 def cart_clear():
     session.pop("cart", None)
-    flash("Košík vyprázdněn.", "info")
+    flash("Kosik vyprazdnen.", "info")
     return redirect(url_for("cart"))
 
 
 # -------------------------
 # CHECKOUT + PAYMENT + ORDERS
-# (nechávám jak jsi měl – pokud už to máš, nemusíš měnit)
 # -------------------------
 @app.route("/checkout", methods=["GET", "POST"])
 @login_required
@@ -577,7 +627,7 @@ def checkout():
     base_total = _cart_total()
 
     if not items:
-        flash("Košík je prázdný.", "error")
+        flash("Kosik je prazdny.", "error")
         return redirect(url_for("cart"))
 
     if request.method == "GET":
@@ -600,7 +650,7 @@ def checkout():
     note = request.form.get("note", "").strip()
 
     if not full_name or not email or not street or not city or not zip_code or not shipping or not payment:
-        flash("Vyplň prosím všechny povinné údaje.", "error")
+        flash("Vypln prosim vsechny povinne udaje.", "error")
         return render_template("checkout.html", items=items, total=base_total)
 
     active = get_active_reward(session["user_id"])
@@ -632,8 +682,8 @@ def checkout():
         if it.get("size"):
             variant.append(f"Velikost {it['size']}")
         if it.get("number"):
-            variant.append(f"Číslo {it['number']}")
-        variant_text = (" • " + " • ".join(variant)) if variant else ""
+            variant.append(f"Cislo {it['number']}")
+        variant_text = (" - " + " - ".join(variant)) if variant else ""
 
         db.session.add(OrderItem(
             order_id=o.id,
@@ -655,12 +705,12 @@ def checkout():
 def payment_gateway():
     order_id = session.get("pending_order_id")
     if not order_id:
-        flash("Nemáš žádnou rozpracovanou objednávku.", "info")
+        flash("Nemas zadnou rozpracovanou objednavku.", "info")
         return redirect(url_for("cart"))
 
     order = Order.query.filter_by(id=order_id, user_id=session["user_id"]).first()
     if not order:
-        flash("Objednávka nebyla nalezena.", "error")
+        flash("Objednavka nebyla nalezena.", "error")
         session.pop("pending_order_id", None)
         return redirect(url_for("cart"))
 
@@ -672,12 +722,12 @@ def payment_gateway():
 def payment_confirm():
     order_id = session.get("pending_order_id")
     if not order_id:
-        flash("Objednávka už není k dispozici.", "error")
+        flash("Objednavka uz neni k dispozici.", "error")
         return redirect(url_for("index"))
 
     order = Order.query.filter_by(id=order_id, user_id=session["user_id"]).first()
     if not order:
-        flash("Objednávka nebyla nalezena.", "error")
+        flash("Objednavka nebyla nalezena.", "error")
         session.pop("pending_order_id", None)
         return redirect(url_for("index"))
 
@@ -696,10 +746,10 @@ def payment_confirm():
         session.pop("pending_order_id", None)
         session.modified = True
 
-        flash(f"Platba proběhla úspěšně. Váš nákup je potvrzen (#{order.order_code}).", "success")
+        flash(f"Platba probehla uspesne. Vas nakup je potvrzen (#{order.order_code}).", "success")
         return redirect(url_for("orders"))
 
-    flash("Platba byla zrušena. Objednávka nebyla dokončena.", "error")
+    flash("Platba byla zrusena. Objednavka nebyla dokoncena.", "error")
     return redirect(url_for("checkout"))
 
 
@@ -715,7 +765,131 @@ def orders():
     return render_template("orders.html", orders=orders_list)
 
 
+# -------------------------
+# ADMIN
+# -------------------------
+ADMIN_USERNAME = "admin"
+
+
+def admin_required(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        if not session.get("user_id"):
+            flash("Nejprve se prihlas.", "error")
+            return redirect(url_for("login", next=request.path))
+        if session.get("username") != ADMIN_USERNAME:
+            abort(403)
+        return fn(*args, **kwargs)
+    return wrapper
+
+
+@app.route("/admin")
+@admin_required
+def admin_panel():
+    products_sorted = [p.to_dict() for p in Product.query.order_by(Product.id).all()]
+    all_orders = Order.query.order_by(Order.created_at.desc()).all()
+    return render_template("admin.html", products=products_sorted, orders=all_orders)
+
+
+@app.route("/admin/product/add", methods=["POST"])
+@admin_required
+def admin_add_product():
+    name = request.form.get("name", "").strip()
+    team_key = request.form.get("team_key", "").strip().lower()
+    type_key = request.form.get("type_key", "home").strip()
+    season = request.form.get("season", "25/26").strip()
+    image_file = request.form.get("image_file", "").strip()
+    badge = request.form.get("badge", "").strip() or None
+
+    try:
+        price = int(request.form.get("price", 0))
+    except ValueError:
+        flash("Neplatna cena.", "error")
+        return redirect(url_for("admin_panel"))
+
+    old_price_raw = request.form.get("old_price", "").strip()
+    old_price = int(old_price_raw) if old_price_raw else None
+
+    sizes_raw = request.form.get("sizes", "S, M, L, XL")
+    numbers_raw = request.form.get("numbers", "Bez cisla, 9, 10")
+    sizes = [s.strip() for s in sizes_raw.split(",") if s.strip()]
+    numbers = [n.strip() for n in numbers_raw.split(",") if n.strip()]
+
+    prod = Product(
+        name=name, team_key=team_key, type_key=type_key, season=season,
+        price=price, old_price=old_price, badge=badge,
+        image_file=image_file if image_file else None,
+        stock_sizes=",".join(sizes),
+        stock_numbers=",".join(numbers),
+    )
+    db.session.add(prod)
+    db.session.commit()
+
+    flash(f"Produkt '{name}' byl pridan (ID {prod.id}).", "success")
+    return redirect(url_for("admin_panel"))
+
+
+@app.route("/admin/product/edit", methods=["POST"])
+@admin_required
+def admin_edit_product():
+    pid = request.form.get("product_id", "").strip()
+    name = request.form.get("name", "").strip()
+    badge = request.form.get("badge", "").strip() or None
+
+    try:
+        price = int(request.form.get("price", 0))
+    except ValueError:
+        flash("Neplatna cena.", "error")
+        return redirect(url_for("admin_panel"))
+
+    old_price_raw = request.form.get("old_price", "").strip()
+    old_price = int(old_price_raw) if old_price_raw else None
+
+    prod = Product.query.get(int(pid))
+    if not prod:
+        flash("Produkt nenalezen.", "error")
+        return redirect(url_for("admin_panel"))
+    prod.name = name
+    prod.price = price
+    prod.old_price = old_price
+    prod.badge = badge
+    db.session.commit()
+
+    flash(f"Produkt #{pid} '{name}' byl upraven.", "success")
+    return redirect(url_for("admin_panel"))
+
+
+@app.route("/admin/product/delete/<product_id>", methods=["POST"])
+@admin_required
+def admin_delete_product(product_id):
+    prod = Product.query.get(int(product_id)) if product_id.isdigit() else None
+    if not prod:
+        flash("Produkt nenalezen.", "error")
+        return redirect(url_for("admin_panel"))
+    name = prod.name
+    db.session.delete(prod)
+    db.session.commit()
+    flash(f"Produkt '{name}' byl smazan.", "success")
+    return redirect(url_for("admin_panel"))
+
+
+@app.route("/admin/order/<int:order_id>/status", methods=["POST"])
+@admin_required
+def admin_update_order_status(order_id):
+    order = Order.query.get_or_404(order_id)
+    new_status = request.form.get("status", "pending")
+    allowed = {"pending", "paid", "shipped", "cancelled"}
+    if new_status not in allowed:
+        flash("Neplatny status.", "error")
+        return redirect(url_for("admin_panel"))
+    order.status = new_status
+    db.session.commit()
+    flash(f"Objednavka #{order.order_code} -> status: {new_status}", "success")
+    return redirect(url_for("admin_panel"))
+
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+        _seed_products_if_empty()
     app.run(debug=True, use_reloader=False)
