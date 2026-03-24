@@ -4,56 +4,73 @@
 {% block content %}
 
 <section class="filters card">
+  <div class="filters-header">
+    <h2 class="filters-title">🔍 Filtrovat dresy</h2>
+    <span class="results-count" id="resultsCount"></span>
+  </div>
+
   <div class="filters-row">
     <div class="field">
-      <label>Hledat</label>
-      <input id="q" type="text" placeholder="Např. Arsenal">
+      <label for="q">Hledat</label>
+      <input id="q" type="text" placeholder="Např. Arsenal, Haaland…">
     </div>
 
     <div class="field">
-      <label>Klub</label>
+      <label for="team">Klub</label>
       <select id="team">
-        <option value="">Vše</option>
-        <option value="mancity">Manchester City</option>
-        <option value="realmadrid">Real Madrid</option>
-        <option value="barcelona">Barcelona</option>
-        <option value="bayern">Bayern</option>
-        <option value="psg">PSG</option>
+        <option value="">Všechny kluby</option>
         <option value="arsenal">Arsenal</option>
+        <option value="barcelona">Barcelona</option>
+        <option value="bayern">Bayern Mnichov</option>
         <option value="juventus">Juventus</option>
+        <option value="mancity">Manchester City</option>
+        <option value="psg">PSG</option>
+        <option value="realmadrid">Real Madrid</option>
       </select>
     </div>
 
     <div class="field">
-      <label>Typ</label>
+      <label for="type">Typ dresu</label>
       <select id="type">
-        <option value="">Vše</option>
-        <option value="home">Domácí</option>
-        <option value="away">Venkovní</option>
+        <option value="">Domácí & venkovní</option>
+        <option value="home">🏠 Domácí</option>
+        <option value="away">✈️ Venkovní</option>
       </select>
     </div>
 
     <div class="field">
-      <label>Min cena</label>
-      <input id="minPrice" type="number" placeholder="0">
+      <label for="minPrice">Min. cena (Kč)</label>
+      <input id="minPrice" type="number" placeholder="0" min="0">
     </div>
 
     <div class="field">
-      <label>Max cena</label>
-      <input id="maxPrice" type="number" placeholder="2500">
+      <label for="maxPrice">Max. cena (Kč)</label>
+      <input id="maxPrice" type="number" placeholder="2500" min="0">
     </div>
 
     <div class="field">
+      <label for="sort">Řadit dle</label>
+      <select id="sort">
+        <option value="">Výchozí</option>
+        <option value="price_asc">Cena ↑</option>
+        <option value="price_desc">Cena ↓</option>
+        <option value="name_asc">Název A–Z</option>
+      </select>
+    </div>
+
+    <div class="field field-reset">
       <label>&nbsp;</label>
-      <button id="reset" class="btn ghost" type="button">Reset</button>
+      <button id="reset" class="btn ghost" type="button">✕ Zrušit filtry</button>
     </div>
   </div>
+
+  <div class="active-filters" id="activeFilters"></div>
 </section>
 
 <div class="products" id="products">
   {% for p in products %}
     <div class="product-card"
-         data-name="{{ p.name }}"
+         data-name="{{ p.name | lower }}"
          data-team="{{ p.team_key }}"
          data-type="{{ p.type_key }}"
          data-price="{{ p.price }}">
@@ -64,58 +81,144 @@
 
       <a class="product-link" href="{{ url_for('product_detail', product_id=p.id) }}">
         {% if p.image_url %}
-          <img src="{{ p.image_url }}" alt="{{ p.name }}">
+          <img src="{{ p.image_url }}" alt="{{ p.name }}" loading="lazy">
         {% endif %}
         <h3>{{ p.name }}</h3>
       </a>
 
-      <p class="muted small">{{ p.season }}</p>
+      <p class="muted small">Sezóna {{ p.season }}</p>
 
       <div class="price-wrap">
-          {% if p.old_price %}
-            <span class="old-price">{{ p.old_price }} Kč</span>
-          {% endif %}
-          <span class="price">{{ p.price }} Kč</span>
+        {% if p.old_price %}
+          <span class="old-price">{{ p.old_price }} Kč</span>
+        {% endif %}
+        <span class="price">{{ p.price }} Kč</span>
+        {% if p.old_price %}
+          <span class="discount-pct">-{{ ((1 - p.price / p.old_price) * 100) | int }}%</span>
+        {% endif %}
       </div>
 
       <form method="POST" action="{{ url_for('cart_add') }}">
         <input type="hidden" name="product_id" value="{{ p.id }}">
         <input type="hidden" name="name" value="{{ p.name }}">
         <input type="hidden" name="price" value="{{ p.price }}">
-        <button class="btn" type="submit">Do košíku</button>
+        <button class="btn" type="submit">🛒 Do košíku</button>
       </form>
 
     </div>
   {% endfor %}
 </div>
 
+<!-- Prázdný stav -->
+<div class="empty-state" id="emptyState" style="display:none;">
+  <div class="empty-icon">🔍</div>
+  <h3>Žádné dresy nenalezeny</h3>
+  <p class="muted">Zkus změnit nebo zrušit filtry.</p>
+  <button class="btn ghost" onclick="resetFilters()">Zrušit všechny filtry</button>
+</div>
+
 <script>
-const q = document.getElementById('q');
-const team = document.getElementById('team');
-const type = document.getElementById('type');
+const q        = document.getElementById('q');
+const team     = document.getElementById('team');
+const type     = document.getElementById('type');
 const minPrice = document.getElementById('minPrice');
 const maxPrice = document.getElementById('maxPrice');
-const reset = document.getElementById('reset');
-const cards = Array.from(document.querySelectorAll('.product-card'));
+const sort     = document.getElementById('sort');
+const resetBtn = document.getElementById('reset');
+const grid     = document.getElementById('products');
+const emptyEl  = document.getElementById('emptyState');
+const countEl  = document.getElementById('resultsCount');
+const activeEl = document.getElementById('activeFilters');
 
-function filter(){
-  const text = (q.value || '').toLowerCase().trim();
-  cards.forEach(c=>{
-    const ok =
-      (!text || c.dataset.name.toLowerCase().includes(text)) &&
-      (!team.value || c.dataset.team === team.value) &&
-      (!type.value || c.dataset.type === type.value) &&
-      (!minPrice.value || +c.dataset.price >= +minPrice.value) &&
-      (!maxPrice.value || +c.dataset.price <= +maxPrice.value);
-    c.style.display = ok ? '' : 'none';
+const allCards = Array.from(document.querySelectorAll('.product-card'));
+
+const TEAM_LABELS = {
+  mancity: 'Manchester City', realmadrid: 'Real Madrid',
+  barcelona: 'Barcelona', bayern: 'Bayern Mnichov',
+  psg: 'PSG', arsenal: 'Arsenal', juventus: 'Juventus'
+};
+
+function getVisible() {
+  const text = q.value.toLowerCase().trim();
+  const tv   = team.value;
+  const tyv  = type.value;
+  const minP = minPrice.value !== '' ? +minPrice.value : null;
+  const maxP = maxPrice.value !== '' ? +maxPrice.value : null;
+
+  return allCards.filter(c => {
+    const price = +c.dataset.price;
+    return (
+      (!text || c.dataset.name.includes(text)) &&
+      (!tv   || c.dataset.team === tv) &&
+      (!tyv  || c.dataset.type === tyv) &&
+      (minP === null || price >= minP) &&
+      (maxP === null || price <= maxP)
+    );
   });
 }
 
-[q, team, type, minPrice, maxPrice].forEach(el=>el.addEventListener('input', filter));
-reset.addEventListener('click', ()=>{
-  q.value = team.value = type.value = minPrice.value = maxPrice.value = '';
+function sortCards(cards) {
+  const sv = sort.value;
+  if (!sv) return cards;
+  return [...cards].sort((a, b) => {
+    if (sv === 'price_asc')  return +a.dataset.price - +b.dataset.price;
+    if (sv === 'price_desc') return +b.dataset.price - +a.dataset.price;
+    if (sv === 'name_asc')   return a.dataset.name.localeCompare(b.dataset.name);
+    return 0;
+  });
+}
+
+function updateActiveFilters() {
+  const tags = [];
+  if (q.value.trim())        tags.push(`Hledám: "${q.value.trim()}"`);
+  if (team.value)            tags.push(TEAM_LABELS[team.value] || team.value);
+  if (type.value === 'home') tags.push('Domácí');
+  if (type.value === 'away') tags.push('Venkovní');
+  if (minPrice.value)        tags.push(`Min ${minPrice.value} Kč`);
+  if (maxPrice.value)        tags.push(`Max ${maxPrice.value} Kč`);
+  if (sort.value)            tags.push(sort.options[sort.selectedIndex].text);
+
+  activeEl.innerHTML = tags.map(t =>
+    `<span class="filter-tag">${t}</span>`
+  ).join('');
+}
+
+function filter() {
+  const visible = getVisible();
+  const sorted  = sortCards(visible);
+  const visSet  = new Set(sorted);
+
+  // Skrýt/zobrazit karty ve správném pořadí
+  allCards.forEach(c => { c.style.display = 'none'; });
+  sorted.forEach(c => { c.style.display = ''; });
+
+  // Přeskládat DOM v gridu podle sort pořadí
+  sorted.forEach(c => grid.appendChild(c));
+
+  // Počítadlo
+  const total = allCards.length;
+  countEl.textContent = visible.length < total
+    ? `${visible.length} z ${total} dresů`
+    : `${total} dresů`;
+
+  // Prázdný stav
+  emptyEl.style.display = visible.length === 0 ? '' : 'none';
+
+  updateActiveFilters();
+}
+
+function resetFilters() {
+  q.value = team.value = type.value = minPrice.value = maxPrice.value = sort.value = '';
   filter();
-});
+}
+
+[q, team, type, minPrice, maxPrice, sort].forEach(el =>
+  el.addEventListener('input', filter)
+);
+resetBtn.addEventListener('click', resetFilters);
+
+// Inicializace
+filter();
 </script>
 
 {% endblock %}

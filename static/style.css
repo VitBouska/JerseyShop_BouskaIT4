@@ -637,3 +637,251 @@ input {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+/* =========================
+   Nová hlavička
+========================= */
+.site-header {
+  background: linear-gradient(135deg, #0b1d40 0%, #113a7a 60%, #1a56c4 100%);
+  color: #fff;
+  box-shadow: 0 4px 24px rgba(11, 42, 90, 0.25);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 68px;
+}
+
+/* Logo */
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.header-logo:hover {
+  text-decoration: none;
+  opacity: 0.92;
+}
+
+.logo-icon {
+  font-size: 2rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.3));
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-name {
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.logo-tagline {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  font-weight: 500;
+  margin-top: 2px;
+  letter-spacing: 0.02em;
+}
+
+/* Nav v hlavičce */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.header-nav a {
+  color: rgba(255,255,255,0.88);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 8px 13px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background .15s ease, color .15s ease;
+}
+
+.header-nav a:hover {
+  background: rgba(255,255,255,0.13);
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Košík s odznakem */
+.nav-cart {
+  position: relative;
+}
+
+.cart-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 900;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  padding: 0 4px;
+  margin-left: 4px;
+  vertical-align: middle;
+  box-shadow: 0 2px 6px rgba(239,68,68,.4);
+}
+
+/* Tlačítko Registrace */
+.btn-nav-register {
+  background: rgba(255,255,255,0.18) !important;
+  border: 1px solid rgba(255,255,255,0.35) !important;
+  border-radius: 10px !important;
+  font-weight: 800 !important;
+}
+
+.btn-nav-register:hover {
+  background: rgba(255,255,255,0.28) !important;
+}
+
+/* Odhlásit */
+.nav-logout {
+  color: rgba(255,180,180,0.9) !important;
+}
+
+.nav-logout:hover {
+  background: rgba(239,68,68,0.15) !important;
+  color: #fca5a5 !important;
+}
+
+/* Starý nav — skrýt */
+nav:not(.header-nav) {
+  display: none;
+}
+
+/* Odstraň hr pod navigací */
+hr { display: none; }
+
+@media (max-width: 720px) {
+  .header-inner {
+    flex-direction: column;
+    padding: 12px 18px;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .header-nav {
+    width: 100%;
+    gap: 4px;
+  }
+  .logo-tagline { display: none; }
+}
+
+/* =========================
+   Filtry – vylepšení
+========================= */
+.filters {
+  margin-top: 24px;
+}
+
+.filters-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filters-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.results-count {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--muted);
+  background: rgba(17,58,122,.07);
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+/* Active filter tags */
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  min-height: 0;
+}
+
+.filter-tag {
+  background: rgba(17,58,122,.10);
+  color: var(--primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(17,58,122,.18);
+}
+
+.field-reset {
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================
+   Prázdný stav
+========================= */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  margin-top: 20px;
+}
+
+.empty-icon {
+  font-size: 3.5rem;
+  margin-bottom: 12px;
+  opacity: 0.6;
+}
+
+.empty-state h3 {
+  font-size: 1.3rem;
+  margin: 0 0 8px;
+  color: var(--text);
+}
+
+.empty-state .muted {
+  margin-bottom: 20px;
+}
+
+/* =========================
+   Sleva v % na kartě
+========================= */
+.discount-pct {
+  font-size: 0.8rem;
+  font-weight: 800;
+  background: #ef4444;
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 999px;
+  margin-left: 2px;
+}
