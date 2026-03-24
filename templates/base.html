@@ -25,7 +25,7 @@
         🛒 Košík{% if cart_count %}<span class="cart-badge">{{ cart_count }}</span>{% endif %}
       </a>
       {% if session.get("user_id") %}
-        <a href="{{ url_for('profile') }}">👤 {{ session["username"] }}</a>
+        <a href="{{ url_for('profile') }}"> {{ session["username"] }}</a>
         <a href="{{ url_for('orders') }}">Objednávky</a>
         <a href="{{ url_for('logout') }}" class="nav-logout">Odhlásit</a>
       {% else %}
