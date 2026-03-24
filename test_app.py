@@ -30,7 +30,6 @@ def app():
         db.create_all()
         _seed_products_if_empty()
         yield flask_app
-        db.drop_all()
 
 
 @pytest.fixture
