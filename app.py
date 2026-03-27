@@ -758,26 +758,21 @@ def payment_confirm():
         session.pop("pending_order_id", None)
         return redirect(url_for("index"))
 
-    action = request.form.get("action")
+    order.status = "paid"
+db.session.commit()
 
-    if action == "pay":
-        order.status = "paid"
-        db.session.commit()
+active = get_active_reward(session["user_id"])
+if active:
+    active.used_at = datetime.utcnow()
+    db.session.commit()
 
-        active = get_active_reward(session["user_id"])
-        if active:
-            active.used_at = datetime.utcnow()
-            db.session.commit()
+session.pop("cart", None)
+session.pop("pending_order_id", None)
+session.modified = True
 
-        session.pop("cart", None)
-        session.pop("pending_order_id", None)
-        session.modified = True
+flash(f"Platba probehla uspesne. Vas nakup je potvrzen (#{order.order_code}).", "success")
+return redirect(url_for("orders"))
 
-        flash(f"Platba probehla uspesne. Vas nakup je potvrzen (#{order.order_code}).", "success")
-        return redirect(url_for("orders"))
-
-    flash("Platba byla zrusena. Objednavka nebyla dokoncena.", "error")
-    return redirect(url_for("checkout"))
 
 
 @app.route("/orders")
