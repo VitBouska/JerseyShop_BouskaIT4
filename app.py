@@ -750,7 +750,7 @@ def payment_confirm():
 
     if not card_number or len(card_number.replace(" ", "")) < 16:
         flash("Neplatná karta")
-        return redirect(url_for("payment"))
+        return redirect(url_for("payment_gateway"))
 
     order = Order.query.filter_by(id=order_id, user_id=session["user_id"]).first()
     if not order:
