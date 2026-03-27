@@ -56,6 +56,8 @@
 
     <div id="payment-content">
 
+      <input type="hidden" name="action" value="pay">
+
       <form method="POST" action="{{ url_for('payment_confirm') }}" id="payment-form">
 
         <label>Číslo karty</label>
@@ -88,7 +90,7 @@
                autocomplete="off">
         <div class="field-error" id="err-name"></div>
 
-        <button type="submit" name="action" value="pay">Zaplatit</button>
+        <button type="submit">Zaplatit</button>
 
       </form>
 
