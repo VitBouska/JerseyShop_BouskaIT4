@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+{% block title %}Checkout • E-shop dresy{% endblock %}
+
+{% block content %}
+
+<h2>Objednávka</h2>
+<p class="muted">Vyplň údaje a potvrď objednávku.</p>
+
+{% if active_discount %}
+<div class="discount-banner">
+  <span class="discount-icon">🎡</span>
+  <div>
+    <strong>Máš aktivní slevu z kola štěstí: {{ active_discount }} %!</strong>
+    <span>Sleva bude automaticky odečtena z celkové ceny při dokončení objednávky.</span>
+  </div>
+  <span class="discount-badge">-{{ active_discount }} %</span>
+</div>
+{% endif %}
+
+<div class="checkout-grid">
+  <!-- Form -->
+  <div class="card">
+    <h3 class="section-title">Kontaktní údaje</h3>
+
+    <form method="POST" action="{{ url_for('checkout') }}">
+      <div class="field">
+        <label for="full_name">Jméno a příjmení</label>
+        <input id="full_name" name="full_name" required placeholder="Jan Novák">
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" required placeholder="jan@email.cz">
+      </div>
+
+      <div class="field">
+        <label for="phone">Telefon (volitelné)</label>
+        <input id="phone" name="phone" placeholder="+420 777 000 000">
+      </div>
+
+      <hr>
+
+      <h3 class="section-title">Doručení</h3>
+
+      <div class="field">
+        <label for="street">Ulice a číslo</label>
+        <input id="street" name="street" required placeholder="Hlavní 12">
+      </div>
+
+      <div class="field">
+        <label for="city">Město</label>
+        <input id="city" name="city" required placeholder="Praha">
+      </div>
+
+      <div class="field">
+        <label for="zip_code">PSČ</label>
+        <input id="zip_code" name="zip_code" required placeholder="11000">
+      </div>
+
+      <hr>
+
+      <h3 class="section-title">Doprava</h3>
+      <div class="radio-row">
+        <label class="radio">
+          <input type="radio" name="shipping" value="pickup" required>
+          Osobní odběr (zdarma)
+        </label>
+        <label class="radio">
+          <input type="radio" name="shipping" value="courier" required>
+          Kurýr (+99 Kč)
+        </label>
+      </div>
+
+      <h3 class="section-title">Platba</h3>
+      <div class="radio-row">
+        <label class="radio">
+          <input type="radio" name="payment" value="card" required>
+          Karta online
+        </label>
+        <label class="radio">
+          <input type="radio" name="payment" value="bank" required>
+          Bankovní převod
+        </label>
+        <label class="radio">
+          <input type="radio" name="payment" value="cod" required>
+          Dobírka (+39 Kč)
+        </label>
+      </div>
+
+      <div class="field">
+        <label for="note">Poznámka (volitelné)</label>
+        <input id="note" name="note" placeholder="Např. nevolat, nechat u dveří…">
+      </div>
+
+      <button class="btn" type="submit">Pokračovat k platbě</button>
+    </form>
+  </div>
+
+  <!-- Summary -->
+  <div class="card">
+    <h3 class="section-title">Souhrn košíku</h3>
+
+    <div class="summary-list">
+      {% for it in items %}
+        <div class="summary-item">
+          <div>
+            <strong>{{ it.name }}</strong>
+            <div class="muted">{{ it.qty }}× {{ it.price }} Kč</div>
+          </div>
+          <div><strong>{{ it.qty * it.price }} Kč</strong></div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <hr>
+
+    {% if active_discount %}
+      {% set discount_amount = (total * active_discount / 100) | int %}
+      {% set final_total = total - discount_amount %}
+      <div class="summary-total" style="text-decoration: line-through; opacity: 0.5;">
+        <div class="muted">Původní cena</div>
+        <div>{{ total }} Kč</div>
+      </div>
+      <div class="summary-discount">
+        <div>🎡 Sleva {{ active_discount }} %</div>
+        <div class="discount-value">−{{ discount_amount }} Kč</div>
+      </div>
+      <div class="summary-total">
+        <div class="muted">Celkem po slevě</div>
+        <div class="total discounted">{{ final_total }} Kč</div>
+      </div>
+    {% else %}
+      <div class="summary-total">
+        <div class="muted">Celkem za produkty</div>
+        <div class="total">{{ total }} Kč</div>
+      </div>
+    {% endif %}
+
+    <p class="muted small">
+      Doprava/platba se v této demo verzi nepřipočítává automaticky.
+    </p>
+
+    <a class="btn ghost" href="{{ url_for('cart') }}">Zpět do košíku</a>
+  </div>
+</div>
+
+<style>
+  /* ── Discount banner ── */
+  .discount-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: linear-gradient(135deg, #fffbea 0%, #fef3c7 100%);
+    border: 2px solid #f59e0b;
+    border-left: 6px solid #f59e0b;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 22px;
+    animation: bannerPulse 2.5s ease-in-out infinite;
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.18);
+  }
+  @keyframes bannerPulse {
+    0%, 100% { box-shadow: 0 4px 16px rgba(245, 158, 11, 0.18); }
+    50%       { box-shadow: 0 4px 28px rgba(245, 158, 11, 0.42); }
+  }
+  .discount-banner .discount-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+  .discount-banner div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .discount-banner strong {
+    font-size: 1rem;
+    color: #92400e;
+  }
+  .discount-banner span {
+    font-size: 0.85rem;
+    color: #b45309;
+  }
+  .discount-badge {
+    background: #f59e0b;
+    color: #fff;
+    font-weight: 800;
+    font-size: 1.1rem;
+    padding: 6px 14px;
+    border-radius: 20px;
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
+  }
+
+  /* ── Sleva v souhrnu ── */
+  .summary-discount {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-weight: 600;
+    color: #d97706;
+  }
+  .discount-value {
+    color: #16a34a;
+    font-weight: 700;
+  }
+  .total.discounted {
+    color: #16a34a;
+  }
+</style>
+
+{% endblock %}
