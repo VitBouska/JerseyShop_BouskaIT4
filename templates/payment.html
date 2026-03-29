@@ -49,119 +49,205 @@
     </p>
   </div>
 
-  <!-- Akce -->
+  <!-- Platební údaje -->
   <div class="card">
     <h3 class="section-title">Platební údaje</h3>
-  <p class="muted">Simulace platby kartou (údaje se nikam neodesílají)</p>
+    <p class="muted">Simulace platby kartou (údaje se nikam neodesílají)</p>
 
-  <div id="payment-content">
+    <div id="payment-content">
 
-  <form method="POST" action="{{ url_for('payment_confirm') }}" id="payment-form">
+      <form method="POST" action="{{ url_for('payment_confirm') }}" id="payment-form">
 
-    <label>Číslo karty</label>
-    <input type="text" name="card_number" placeholder="1234 5678 9012 3456">
+        <label>Číslo karty</label>
+        <input type="text" id="card_number" name="card_number"
+               placeholder="1234 5678 9012 3456"
+               maxlength="19"
+               inputmode="numeric"
+               autocomplete="off">
+        <div class="field-error" id="err-card"></div>
 
-    <label>Platnost</label>
-    <input type="text" name="expiry" placeholder="MM/YY">
+        <label>Platnost</label>
+        <input type="text" id="expiry" name="expiry"
+               placeholder="MM/YY"
+               maxlength="5"
+               inputmode="numeric"
+               autocomplete="off">
+        <div class="field-error" id="err-expiry"></div>
 
-    <label>CVC</label>
-    <input type="text" name="cvc" placeholder="123">
+        <label>CVC</label>
+        <input type="text" id="cvc" name="cvc"
+               placeholder="123"
+               maxlength="3"
+               inputmode="numeric"
+               autocomplete="off">
+        <div class="field-error" id="err-cvc"></div>
 
-    <label>Jméno</label>
-    <input type="text" name="card_name">
+        <label>Jméno držitele karty</label>
+        <input type="text" id="card_name" name="card_name"
+               placeholder="Jan Novák"
+               autocomplete="off">
+        <div class="field-error" id="err-name"></div>
 
-    <button type="submit" name="action" value="pay">Zaplatit</button>
+        <button type="submit" name="action" value="pay">Zaplatit</button>
 
-  </form>
+      </form>
 
-</div>
+    </div>
 
-<!-- ❗ ERROR zpráva -->
-<div id="error-box" class="error-box"></div>
+    <!-- Chybová zpráva (obecná) -->
+    <div id="error-box" class="error-box" style="display:none;"></div>
 
-<!-- ❗ LOADING animace -->
-<div id="loading" class="loading">
-  <div class="spinner"></div>
-  <p>Zpracování platby...</p>
-</div>
+    <!-- Loading animace -->
+    <div id="loading" class="loading" style="display:none;">
+      <div class="spinner"></div>
+      <p>Zpracování platby...</p>
+    </div>
 
-  <hr>
-  <a class="btn ghost" href="{{ url_for('checkout') }}">Zpět</a>
+    <hr>
+    <a class="btn ghost" href="{{ url_for('checkout') }}">Zpět</a>
   </div>
 </div>
 
-{% endblock %}
+<style>
+  .field-error {
+    color: #e53e3e;
+    font-size: 0.85rem;
+    margin-top: 3px;
+    margin-bottom: 6px;
+    min-height: 1.2em;
+  }
+  input.input-error {
+    border-color: #e53e3e !important;
+  }
+</style>
 
 <script>
-const form = document.getElementById("payment-form");
-const cardInput = document.querySelector("[name='card_number']");
-const expiryInput = document.querySelector("[name='expiry']");
-const cvcInput = document.querySelector("[name='cvc']");
+const cardInput   = document.getElementById("card_number");
+const expiryInput = document.getElementById("expiry");
+const cvcInput    = document.getElementById("cvc");
+const nameInput   = document.getElementById("card_name");
+const form        = document.getElementById("payment-form");
 
-// 👉 Formátování čísla karty (1234 5678 9012 3456)
-cardInput.addEventListener("input", (e) => {
-  let value = e.target.value.replace(/\D/g, "");
-  value = value.substring(0, 16);
-  value = value.replace(/(.{4})/g, "$1 ").trim();
-  e.target.value = value;
-});
-
-// 👉 Formátování expirace (MM/YY)
-expiryInput.addEventListener("input", (e) => {
-  let value = e.target.value.replace(/\D/g, "");
-  if (value.length > 4) value = value.substring(0, 4);
-  if (value.length >= 3) {
-    value = value.substring(0,2) + "/" + value.substring(2);
-  }
-  e.target.value = value;
-});
-
-// 👉 Jen čísla do CVC
-cvcInput.addEventListener("input", (e) => {
-  e.target.value = e.target.value.replace(/\D/g, "").substring(0,3);
-});
-
-// 👉 Validace + animace
-form.addEventListener("submit", function(e) {
-  const card = cardInput.value.replace(/\s/g, "");
-  const expiry = expiryInput.value;
-  const cvc = cvcInput.value;
-
-  let error = "";
-
-  if (card.length < 16) {
-    error = "Číslo karty musí mít 16 číslic";
-  } else if (!/^\d{2}\/\d{2}$/.test(expiry)) {
-    error = "Neplatná expirace (MM/YY)";
-  } else if (cvc.length !== 3) {
-    error = "CVC musí mít 3 číslice";
-  }
-
-  if (error) {
-    e.preventDefault();
-    showError(error);
-    return;
-  }
-
-  // 👉 Animace „zpracování“
-  e.preventDefault();
-  showLoading();
-
-  setTimeout(() => {
-    form.submit();
-  }, 2000);
-});
-
-// 👉 Error message
-function showError(msg) {
-  let box = document.getElementById("error-box");
-  box.innerText = msg;
-  box.style.display = "block";
+// ── Pomocné funkce pro chyby u polí ──
+function fieldError(id, msg) {
+  const el = document.getElementById(id);
+  el.innerText = msg;
+  el.previousElementSibling.classList.add("input-error");
+}
+function fieldOk(id) {
+  const el = document.getElementById(id);
+  el.innerText = "";
+  el.previousElementSibling.classList.remove("input-error");
 }
 
-// 👉 Loading animace
-function showLoading() {
+// ── Číslo karty: blokuj písmena, max 16 číslic, auto-mezery ──
+cardInput.addEventListener("keypress", (e) => {
+  if (!/[0-9]/.test(e.key)) e.preventDefault();
+});
+cardInput.addEventListener("input", () => {
+  let v = cardInput.value.replace(/\D/g, "").substring(0, 16);
+  cardInput.value = v.replace(/(.{4})/g, "$1 ").trim();
+  fieldOk("err-card");
+});
+
+// ── Expirace: blokuj písmena, auto-lomítko MM/YY ──
+expiryInput.addEventListener("keypress", (e) => {
+  if (!/[0-9]/.test(e.key)) e.preventDefault();
+});
+expiryInput.addEventListener("input", () => {
+  let v = expiryInput.value.replace(/\D/g, "").substring(0, 4);
+  if (v.length >= 3) v = v.substring(0, 2) + "/" + v.substring(2);
+  expiryInput.value = v;
+  fieldOk("err-expiry");
+});
+
+// ── CVC: blokuj písmena, max 3 číslice ──
+cvcInput.addEventListener("keypress", (e) => {
+  if (!/[0-9]/.test(e.key)) e.preventDefault();
+});
+cvcInput.addEventListener("input", () => {
+  cvcInput.value = cvcInput.value.replace(/\D/g, "").substring(0, 3);
+  fieldOk("err-cvc");
+});
+
+nameInput.addEventListener("input", () => fieldOk("err-name"));
+
+// ── Validace při odeslání ──
+form.addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  const card   = cardInput.value.replace(/\s/g, "");
+  const expiry = expiryInput.value.trim();
+  const cvc    = cvcInput.value.trim();
+  const name   = nameInput.value.trim();
+
+  let hasError = false;
+
+  // Číslo karty
+  if (card.length === 0) {
+    fieldError("err-card", "Nevyplnili jste číslo karty.");
+    hasError = true;
+  } else if (card.length < 16) {
+    fieldError("err-card", "Číslo karty musí mít 16 číslic.");
+    hasError = true;
+  } else {
+    fieldOk("err-card");
+  }
+
+  // Expirace
+  if (expiry.length === 0) {
+    fieldError("err-expiry", "Nevyplnili jste datum platnosti.");
+    hasError = true;
+  } else if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+    fieldError("err-expiry", "Datum platnosti musí být ve formátu MM/YY.");
+    hasError = true;
+  } else {
+    const mm = parseInt(expiry.substring(0, 2), 10);
+    const yy = parseInt(expiry.substring(3), 10);
+    const now = new Date();
+    const cardYear  = 2000 + yy;
+    const cardMonth = mm;
+    if (mm < 1 || mm > 12) {
+      fieldError("err-expiry", "Měsíc musí být mezi 01 a 12.");
+      hasError = true;
+    } else if (cardYear < now.getFullYear() ||
+               (cardYear === now.getFullYear() && cardMonth < now.getMonth() + 1)) {
+      fieldError("err-expiry", "Platnost karty vypršela.");
+      hasError = true;
+    } else {
+      fieldOk("err-expiry");
+    }
+  }
+
+  // CVC
+  if (cvc.length === 0) {
+    fieldError("err-cvc", "Nevyplnili jste CVC kód.");
+    hasError = true;
+  } else if (cvc.length < 3) {
+    fieldError("err-cvc", "CVC kód musí mít 3 číslice.");
+    hasError = true;
+  } else {
+    fieldOk("err-cvc");
+  }
+
+  // Jméno
+  if (name.length === 0) {
+    fieldError("err-name", "Nevyplnili jste jméno držitele karty.");
+    hasError = true;
+  } else if (/\d/.test(name)) {
+    fieldError("err-name", "Jméno nesmí obsahovat číslice.");
+    hasError = true;
+  } else {
+    fieldOk("err-name");
+  }
+
+  if (hasError) return;
+
+  // Vše OK → animace zpracování
   document.getElementById("payment-content").style.display = "none";
   document.getElementById("loading").style.display = "flex";
-}
+  setTimeout(() => form.submit(), 2000);
+});
 </script>
+
+{% endblock %}

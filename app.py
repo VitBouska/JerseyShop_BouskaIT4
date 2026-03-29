@@ -384,12 +384,33 @@ def last_spin_time(user_id: int):
     return last.issued_at if last else None
 
 
+def _real_utcnow() -> datetime:
+    """Vrací skutečný UTC čas z internetu (NTP). Pokud selže, použije systémový čas."""
+    import socket, struct
+    try:
+        NTP_SERVER = "pool.ntp.org"
+        client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        client.settimeout(3)
+        data = b'\x1b' + 47 * b'\0'
+        client.sendto(data, (NTP_SERVER, 123))
+        data, _ = client.recvfrom(1024)
+        client.close()
+        if data:
+            t = struct.unpack('!12I', data)[10]
+            t -= 2208988800  # rozdíl epoch NTP vs Unix
+            return datetime.utcfromtimestamp(t)
+    except Exception:
+        pass
+    return datetime.utcnow()
+
+
 def can_spin(user_id: int):
     last = last_spin_time(user_id)
     if not last:
         return True, None
     next_time = last + timedelta(hours=24)
-    return datetime.utcnow() >= next_time, next_time
+    now = _real_utcnow()
+    return now >= next_time, next_time
 
 
 # -------------------------
@@ -512,7 +533,7 @@ def wheel_spin():
 
     ok, next_time = can_spin(uid)
     if not ok:
-        remaining = int((next_time - datetime.utcnow()).total_seconds())
+        remaining = int((next_time - _real_utcnow()).total_seconds())
         return jsonify({"ok": False, "error": "wait", "remaining": max(0, remaining)}), 429
 
     active = get_active_reward(uid)
